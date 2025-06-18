@@ -25,7 +25,7 @@ export default function ManagerList() {
   useEffect(() => {
     const fetchManagers = async () => {
       try {
-        const res = await fetch("http://localhost:3300/manager")
+        const res = await fetch("https://vrc-server-production.up.railway.app/manager")
         if (!res.ok) {
           throw new Error("Failed to fetch manager data")
         }

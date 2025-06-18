@@ -35,7 +35,7 @@ export default function MinimalMeetupForm1() {
 
   const handleSubmit = async () => {
     try {
-      const response = await fetch("http://localhost:3300/meetup", {
+      const response = await fetch("https://vrc-server-production.up.railway.app/meetup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

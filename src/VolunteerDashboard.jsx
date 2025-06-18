@@ -40,7 +40,7 @@ export default function VolunteerDashboard() {
     const fetchVolunteers = async () => {
       try {
         setLoading(true)
-        const response = await fetch("http://localhost:3300")
+        const response = await fetch("https://vrc-server-production.up.railway.app")
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`)
@@ -116,7 +116,7 @@ export default function VolunteerDashboard() {
             <Box>
               <AlertTitle>Error loading data!</AlertTitle>
               <AlertDescription>
-                Failed to fetch volunteers from http://localhost:3300
+                Failed to fetch volunteers from https://vrc-server-production.up.railway.app
                 <br />
                 Error: {error}
               </AlertDescription>
@@ -269,7 +269,7 @@ export default function VolunteerDashboard() {
   mt={4}
   onClick={async () => {
     try {
-      const res = await fetch("http://localhost:3300/send-notification", {
+      const res = await fetch("https://vrc-server-production.up.railway.app/send-notification", {
         method: "POST",
       })
 

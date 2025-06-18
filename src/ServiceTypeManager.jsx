@@ -23,7 +23,7 @@ const ServiceTypeManager = () => {
 
   const fetchVolunteers = async () => {
     try {
-      const res = await fetch("http://localhost:3300") // Adjust this if endpoint is /volunteers
+      const res = await fetch("https://vrc-server-production.up.railway.app") // Adjust this if endpoint is /volunteers
       const data = await res.json()
       setVolunteers(data)
     } catch (error) {
@@ -42,7 +42,7 @@ const ServiceTypeManager = () => {
 
   const handleServiceTypeChange = async (id, newType) => {
     try {
-      await fetch(`http://localhost:3300/${id}`, {
+      await fetch(`https://vrc-server-production.up.railway.app/${id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
