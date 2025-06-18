@@ -42,7 +42,7 @@ export default function VolunteerRegistrationForm() {
 
   const handleSubmit = async () => {
     try {
-      const res = await fetch("http://localhost:3300/register-volunteer", {
+      const res = await fetch("https://vrc-server-production.up.railway.app/register-volunteer", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
