@@ -12,9 +12,9 @@ import {
 import { Link } from "react-router-dom";
 
 const SidebarContent = ({ onClose }) => (
-  <VStack align="stretch" spacing="4" p="5">
+  <VStack align="stretch" spacing="2" p="3">
     <Text fontSize="2xl" fontWeight="bold" mb="6" textAlign="center">
-      My Sidebar
+      VSM-Volunteer
     </Text>
 
     {[

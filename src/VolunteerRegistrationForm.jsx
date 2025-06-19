@@ -129,7 +129,7 @@ export default function VolunteerRegistrationForm() {
                 )}
               </FormControl>
 
-              <Button colorScheme="blue" width="full" onClick={handleSubmit} isDisabled={loadingServices}>
+              <Button colorScheme="teal" width="full" onClick={handleSubmit} isDisabled={loadingServices}>
                 Submit
               </Button>
             </VStack>

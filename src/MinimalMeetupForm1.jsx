@@ -97,7 +97,7 @@ export default function MinimalMeetupForm1() {
               <Textarea value={formData.message} onChange={(e) => handleChange("message", e.target.value)} />
             </FormControl>
 
-            <Button colorScheme="blue" width="full" onClick={handleSubmit}>
+            <Button colorScheme="teal" width="full" onClick={handleSubmit}>
               Submit
             </Button>
           </VStack>

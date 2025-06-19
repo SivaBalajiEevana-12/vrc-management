@@ -116,7 +116,7 @@ const ServiceTypeManager = () => {
       <Layout>
         <Box bg="gray.50" minH="100vh" py={8}>
           <Container maxW="2xl">
-            <Heading size="lg" mb={6} color="orange.500">
+            <Heading size="lg" mb={6} color="teal.600">
               Volunteer Service Type Assignment
             </Heading>
 
