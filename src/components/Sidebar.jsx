@@ -1,90 +1,74 @@
-// src/components/Sidebar.js
-import { Box, VStack, Text, Button } from "@chakra-ui/react";
-import { Link, useNavigate } from "react-router-dom";
+// components/Sidebar.js
+import {
+  Box,
+  VStack,
+  Text,
+  useBreakpointValue,
+  Drawer,
+  DrawerOverlay,
+  DrawerContent,
+  DrawerBody,
+} from "@chakra-ui/react";
+import { Link } from "react-router-dom";
 
-const Sidebar = () => {
-  const navigate = useNavigate();
+const SidebarContent = ({ onClose }) => (
+  <VStack align="stretch" spacing="4" p="5">
+    <Text fontSize="2xl" fontWeight="bold" mb="6" textAlign="center">
+      My Sidebar
+    </Text>
 
-  const handleLogout = () => {
-    sessionStorage.removeItem("authToken"); // Remove token or session data
-    navigate("/login"); // Redirect to login page
-  };
+    {[
+      { label: "Users", path: "/" },
+      { label: "Assign-Service", path: "/service" },
+      { label: "Send-MeetUp Message", path: "/meetup" },
+      { label: "Volunteer-Manager", path: "/Registeration" },
+      { label: "Managers", path: "/manager" },
+      { label: "Services", path: "/service-list" },
+    ].map(({ label, path }) => (
+      <Box
+        as={Link}
+        to={path}
+        _hover={{ bg: "gray.700" }}
+        p="3"
+        borderRadius="md"
+        onClick={onClose}
+        key={label}
+      >
+        {label}
+      </Box>
+    ))}
+  </VStack>
+);
+
+const Sidebar = ({ isOpen, onClose }) => {
+  const isMobile = useBreakpointValue({ base: true, md: false });
+
+  if (isMobile) {
+    return (
+      <Drawer isOpen={isOpen} placement="left" onClose={onClose}>
+        <DrawerOverlay />
+        <DrawerContent bg="gray.800" color="white">
+          <DrawerBody>
+            <SidebarContent onClose={onClose} />
+          </DrawerBody>
+        </DrawerContent>
+      </Drawer>
+    );
+  }
 
   return (
     <Box
+      position="fixed"
+      left="0"
+      top="0"
       width="250px"
+      height="100vh"
       bg="gray.800"
       color="white"
+      zIndex="1000"
       p="5"
-      height="100vh"
-      position="sticky"
-      top="0"
     >
-      <Text fontSize="2xl" fontWeight="bold" mb="6" textAlign="center">
-        My Sidebar
-      </Text>
-      <VStack align="stretch" spacing="4">
-        <Box
-          as={Link}
-          to="/"
-          _hover={{ bg: "gray.700" }}
-          p="3"
-          borderRadius="md"
-          cursor="pointer"
-        >
-         Users
-        </Box>
-        <Box
-          as={Link}
-          to="/service"
-          _hover={{ bg: "gray.700" }}
-          p="3"
-          borderRadius="md"
-          cursor="pointer"
-        >
-         Assign-Service
-        </Box>
-        <Box
-          as={Link}
-          to="/meetup"
-          _hover={{ bg: "gray.700" }}
-          p="3"
-          borderRadius="md"
-          cursor="pointer"
-        >
-         Send-MeetUp Message
-        </Box>
-    <Box
-          as={Link}
-          to="/Registeration"
-          _hover={{ bg: "gray.700" }}
-          p="3"
-          borderRadius="md"
-          cursor="pointer"
-        >
-         Volunteer-Manager
-        </Box>
-    <Box
-          as={Link}
-          to="/manager"
-          _hover={{ bg: "gray.700" }}
-          p="3"
-          borderRadius="md"
-          cursor="pointer"
-        >
-         Managers
-        </Box>
-        {/* Logout Button */}
-        {/* <Button
-          onClick={handleLogout}
-          colorScheme="red"
-          size="sm"
-          mt="8"
-          alignSelf="start"
-        >
-          Logout
-        </Button> */}
-      </VStack>
+      <SidebarContent />
     </Box>
   );
 };

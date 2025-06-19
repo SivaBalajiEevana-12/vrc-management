@@ -18,6 +18,8 @@ import MinimalMeetupForm1 from './MinimalMeetupForm1';
 import VolunteerDashboard from './VolunteerDashboard';
 import VolunteerRegistrationForm from './VolunteerRegistrationForm';
 import ManagerList from './ManagerList';
+import ServiceForm from './ServiceForm';
+import ServiceList from './ServiceList';
 // import MinimalMeetupForm from './MinimalMeetupForm.JSX';
 // import MinimalMeetupForm from './MinimalMeetupForm';
 // import MinimalMeetupForm from './MinimalMeetupForm.JSX';
@@ -35,6 +37,8 @@ function App() {
       <Route path='/' element={ <VolunteerDashboard/>}/>
       <Route path='/Registeration' element={<VolunteerRegistrationForm/>}/>
       <Route path='/manager' element={<ManagerList/>}/>
+      <Route path='/post-service' element={<ServiceForm/>}/>
+      <Route path='/service-list' element={<ServiceList/>}/>
       </Routes>
    
     </ChakraProvider>
