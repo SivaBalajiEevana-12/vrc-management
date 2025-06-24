@@ -60,42 +60,57 @@ export default function VolunteerRegistrationForm() {
     setFormData(prev => ({ ...prev, [field]: value }))
   }
 
-  const handleSubmit = async () => {
-    try {
-      const res = await fetch("https://vrc-server-production.up.railway.app/register-volunteer", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      })
-
-      if (!res.ok) throw new Error("Failed to register volunteer")
-
-      toast({
-        title: "Volunteer Registered",
-        description: "Volunteer has been successfully registered.",
-        status: "success",
-        duration: 4000,
-        isClosable: true,
-      })
-
-      setFormData({
-        username: "",
-        phone: "",
-        serviceType: "",
-        link: "",
-        location: "",
-        reportingTime: "",
-      })
-    } catch (err) {
-      toast({
-        title: "Error",
-        description: err.message,
-        status: "error",
-        duration: 4000,
-        isClosable: true,
-      })
-    }
+ const handleSubmit = async () => {
+  // Basic validation
+  const { username, phone, serviceType, link, location, reportingTime } = formData;
+  if (!username || !phone || !serviceType || !link || !location || !reportingTime) {
+    toast({
+      title: "Missing Fields",
+      description: "Please fill in all required fields.",
+      status: "warning",
+      duration: 4000,
+      isClosable: true,
+    });
+    return;
   }
+
+  try {
+    const res = await fetch("https://vrc-server-production.up.railway.app/register-volunteer", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData),
+    });
+
+    if (!res.ok) throw new Error("Failed to register volunteer");
+
+    toast({
+      title: "Volunteer Registered",
+      description: "Volunteer has been successfully registered.",
+      status: "success",
+      duration: 4000,
+      isClosable: true,
+    });
+
+    // Reset form
+    setFormData({
+      username: "",
+      phone: "",
+      serviceType: "",
+      link: "",
+      location: "",
+      reportingTime: "",
+    });
+  } catch (err) {
+    toast({
+      title: "Error",
+      description: err.message,
+      status: "error",
+      duration: 4000,
+      isClosable: true,
+    });
+  }
+};
+
 
   return (
     <ChakraProvider>
