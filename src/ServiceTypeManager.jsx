@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import {
   Box,
   ChakraProvider,
@@ -13,6 +13,13 @@ import {
   Spinner,
   useToast,
   Divider,
+  AlertDialog,
+  AlertDialogOverlay,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogBody,
+  AlertDialogFooter,
+  Button,
 } from "@chakra-ui/react"
 import Layout from "./components/Layout"
 
@@ -20,11 +27,14 @@ const ServiceTypeManager = () => {
   const [volunteers, setVolunteers] = useState([])
   const [serviceOptions, setServiceOptions] = useState([])
   const [loading, setLoading] = useState(true)
+  const [selectedUpdate, setSelectedUpdate] = useState(null) // { id, newType }
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const cancelRef = useRef()
   const toast = useToast()
 
   const fetchVolunteers = async () => {
     try {
-      const res = await fetch("https://vrc-server-production.up.railway.app") // Adjust endpoint if needed
+      const res = await fetch("https://vrc-server-production.up.railway.app")
       const data = await res.json()
       setVolunteers(data)
     } catch (error) {
@@ -41,7 +51,7 @@ const ServiceTypeManager = () => {
 
   const fetchServices = async () => {
     try {
-      const res = await fetch("https://vrc-server-production.up.railway.app/service") // Replace with your actual endpoint
+      const res = await fetch("https://vrc-server-production.up.railway.app/service")
       const data = await res.json()
       setServiceOptions(data)
     } catch (error) {
@@ -56,7 +66,13 @@ const ServiceTypeManager = () => {
     }
   }
 
-  const handleServiceTypeChange = async (id, newType) => {
+  const confirmServiceTypeChange = (id, newType) => {
+    setSelectedUpdate({ id, newType })
+    setIsDialogOpen(true)
+  }
+
+  const performUpdate = async () => {
+    const { id, newType } = selectedUpdate
     try {
       await fetch(`https://vrc-server-production.up.railway.app/${id}`, {
         method: "PATCH",
@@ -73,9 +89,7 @@ const ServiceTypeManager = () => {
       })
 
       setVolunteers((prev) =>
-        prev.map((v) =>
-          v._id === id ? { ...v, serviceType: newType } : v
-        )
+        prev.map((v) => (v._id === id ? { ...v, serviceType: newType } : v))
       )
     } catch (error) {
       console.error("Update failed:", error)
@@ -86,6 +100,8 @@ const ServiceTypeManager = () => {
         duration: 3000,
         isClosable: true,
       })
+    } finally {
+      setIsDialogOpen(false)
     }
   }
 
@@ -146,7 +162,7 @@ const ServiceTypeManager = () => {
                         placeholder="Select service type"
                         value={volunteer.serviceType}
                         onChange={(e) =>
-                          handleServiceTypeChange(volunteer._id, e.target.value)
+                          confirmServiceTypeChange(volunteer._id, e.target.value)
                         }
                       >
                         {serviceOptions.map((service) => (
@@ -162,6 +178,34 @@ const ServiceTypeManager = () => {
             </VStack>
           </Container>
         </Box>
+
+        {/* AlertDialog for confirmation */}
+        <AlertDialog
+          isOpen={isDialogOpen}
+          leastDestructiveRef={cancelRef}
+          onClose={() => setIsDialogOpen(false)}
+        >
+          <AlertDialogOverlay>
+            <AlertDialogContent>
+              <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                Confirm Update
+              </AlertDialogHeader>
+
+              <AlertDialogBody>
+                Are you sure you want to update the service type?
+              </AlertDialogBody>
+
+              <AlertDialogFooter>
+                <Button ref={cancelRef} onClick={() => setIsDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button colorScheme="teal" onClick={performUpdate} ml={3}>
+                  Confirm
+                </Button>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialogOverlay>
+        </AlertDialog>
       </Layout>
     </ChakraProvider>
   )
