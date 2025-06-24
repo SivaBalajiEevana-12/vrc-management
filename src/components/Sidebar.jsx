@@ -18,7 +18,7 @@ const SidebarContent = ({ onClose }) => (
     </Text>
 
     {[
-      { label: "Users", path: "/" },
+      { label: "All Volunteers", path: "/" },
       { label: "Assign-Service", path: "/service" },
       { label: "Send-MeetUp Message", path: "/meetup" },
       { label: "Volunteer-Manager", path: "/Registeration" },

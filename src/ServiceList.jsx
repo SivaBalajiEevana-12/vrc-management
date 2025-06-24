@@ -11,7 +11,6 @@ import {
 } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import Layout from './components/Layout';
-// import { Layout } from 'lucide-react';
 
 const ServiceList = () => {
   const [services, setServices] = useState([]);
@@ -24,6 +23,7 @@ const ServiceList = () => {
       const res = await fetch('https://vrc-server-production.up.railway.app/service');
       const data = await res.json();
       setServices(data);
+      console.log('Fetched services:', data); 
       setLoading(false);
     } catch (err) {
       toast({
@@ -68,43 +68,49 @@ const ServiceList = () => {
 
   return (
     <Layout>
-    <Box maxW="lg" mx="auto" mt={10} p={5} borderWidth={1} borderRadius="lg" boxShadow="md">
-      <Heading mb={4}>Service List</Heading>
+      <Box maxW="lg" mx="auto" mt={10} p={5} borderWidth={1} borderRadius="lg" boxShadow="md">
+        <Heading mb={4}>Service List</Heading>
 
-      <Button colorScheme="teal" mb={6} onClick={() => navigate('/post-service')}>
-        Add New Service
-      </Button>
+        <Button colorScheme="teal" mb={6} onClick={() => navigate('/post-service')}>
+          Add New Service
+        </Button>
 
-      {loading ? (
-        <Spinner />
-      ) : services.length === 0 ? (
-        <Text>No services found.</Text>
-      ) : (
-        <Stack spacing={4}>
-          {services.map((service) => (
-            <Box
-              key={service._id}
-              p={4}
-              borderWidth={1}
-              borderRadius="md"
-              boxShadow="sm"
-              bg="gray.50"
-            >
-              <HStack justify="space-between">
-                <Text>{service.name}</Text>
-                <Button
-                  colorScheme="red"
-                  size="sm"
-                  onClick={() => deleteService(service._id)}
-                >
-                  Delete
-                </Button>
-              </HStack>
-            </Box>
-          ))}
-        </Stack>
-      )}
-    </Box>
+        {loading ? (
+          <Spinner />
+        ) : services.length === 0 ? (
+          <Text>No services found.</Text>
+        ) : (
+          <Stack spacing={4}>
+            {services.map((service) => (
+              <Box
+                key={service._id}
+                p={4}
+                borderWidth={1}
+                borderRadius="md"
+                boxShadow="sm"
+                bg="gray.50"
+              >
+                <HStack justify="space-between" mb={2}>
+                  <Text fontWeight="bold">{service.name}</Text>
+                  <Button
+                    colorScheme="red"
+                    size="sm"
+                    onClick={() => deleteService(service._id)}
+                  >
+                    Delete
+                  </Button>
+                </HStack>
+
+                {service.reportingTime && (
+                  <Text fontSize="sm" color="gray.600">
+                    🕒 Report Time: {service.reportingTime.replace(/(AM|PM)/, ' $1')}
+                  </Text>
+                )}
+              </Box>
+            ))}
+          </Stack>
+        )}
+      </Box>
     </Layout>
   );
 };

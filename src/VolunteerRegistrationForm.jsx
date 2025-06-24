@@ -1,4 +1,4 @@
-"use client"
+// "use client"
 
 import { useState, useEffect } from "react"
 import {
@@ -14,7 +14,6 @@ import {
   Button,
   useToast,
   Spinner,
-  Text,
 } from "@chakra-ui/react"
 import Layout from "./components/Layout"
 
@@ -25,20 +24,22 @@ export default function VolunteerRegistrationForm() {
     username: "",
     phone: "",
     serviceType: "",
+    link: "",
+    location: "",
+    reportingTime: "",
   })
 
   const [serviceOptions, setServiceOptions] = useState([])
   const [loadingServices, setLoadingServices] = useState(true)
 
-  // Fetch service list from backend
+  // Fetch service list
   useEffect(() => {
     const fetchServices = async () => {
       try {
-        const res = await fetch("https://vrc-server-production.up.railway.app/service") // <-- Update this if your endpoint differs
+        const res = await fetch("https://vrc-server-production.up.railway.app/service")
         if (!res.ok) throw new Error("Failed to fetch services")
         const data = await res.json()
         setServiceOptions(data)
-        setLoadingServices(false)
       } catch (err) {
         toast({
           title: "Error loading services",
@@ -47,6 +48,7 @@ export default function VolunteerRegistrationForm() {
           duration: 4000,
           isClosable: true,
         })
+      } finally {
         setLoadingServices(false)
       }
     }
@@ -55,10 +57,7 @@ export default function VolunteerRegistrationForm() {
   }, [toast])
 
   const handleChange = (field, value) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value,
-    }))
+    setFormData(prev => ({ ...prev, [field]: value }))
   }
 
   const handleSubmit = async () => {
@@ -69,7 +68,7 @@ export default function VolunteerRegistrationForm() {
         body: JSON.stringify(formData),
       })
 
-      if (!res.ok) throw new Error("Failed to submit volunteer")
+      if (!res.ok) throw new Error("Failed to register volunteer")
 
       toast({
         title: "Volunteer Registered",
@@ -79,7 +78,14 @@ export default function VolunteerRegistrationForm() {
         isClosable: true,
       })
 
-      setFormData({ username: "", phone: "", serviceType: "" })
+      setFormData({
+        username: "",
+        phone: "",
+        serviceType: "",
+        link: "",
+        location: "",
+        reportingTime: "",
+      })
     } catch (err) {
       toast({
         title: "Error",
@@ -107,26 +113,39 @@ export default function VolunteerRegistrationForm() {
 
               <FormControl isRequired>
                 <FormLabel>Phone Number</FormLabel>
-                <Input value={formData.phone} onChange={e => handleChange("phone", e.target.value)} />
+                <Input type="tel" value={formData.phone} onChange={e => handleChange("phone", e.target.value)} />
               </FormControl>
 
               <FormControl isRequired>
-                <FormLabel>Service Type</FormLabel>
-                {loadingServices ? (
-                  <Spinner />
-                ) : (
-                  <Select
-                    placeholder="Select service type"
-                    value={formData.serviceType}
-                    onChange={e => handleChange("serviceType", e.target.value)}
-                  >
-                    {serviceOptions.map(service => (
-                      <option key={service._id} value={service.name}>
-                        {service.name}
-                      </option>
-                    ))}
-                  </Select>
-                )}
+  <FormLabel>Service Type</FormLabel>
+  <Input
+    placeholder="Enter service type"
+    value={formData.serviceType}
+    onChange={e => handleChange("serviceType", e.target.value)}
+  />
+</FormControl>
+
+              <FormControl isRequired>
+                <FormLabel>Location</FormLabel>
+                <Input value={formData.location} onChange={e => handleChange("location", e.target.value)} />
+              </FormControl>
+
+              <FormControl isRequired>
+                <FormLabel>Location Link</FormLabel>
+                <Input
+                  type="url"
+                  value={formData.link}
+                  onChange={e => handleChange("link", e.target.value)}
+                />
+              </FormControl>
+
+              <FormControl isRequired>
+                <FormLabel>Reporting Time</FormLabel>
+                <Input
+                  type="time"
+                  value={formData.reportingTime}
+                  onChange={e => handleChange("reportingTime", e.target.value)}
+                />
               </FormControl>
 
               <Button colorScheme="teal" width="full" onClick={handleSubmit} isDisabled={loadingServices}>
