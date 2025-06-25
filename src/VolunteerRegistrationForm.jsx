@@ -75,7 +75,7 @@ export default function VolunteerRegistrationForm() {
   }
 
   try {
-    const res = await fetch("https://vrc-server-production.up.railway.app/register-volunteer", {
+    const res = await fetch("http://localhost:3300/register-volunteer", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(formData),
@@ -131,14 +131,25 @@ export default function VolunteerRegistrationForm() {
                 <Input type="tel" value={formData.phone} onChange={e => handleChange("phone", e.target.value)} />
               </FormControl>
 
-              <FormControl isRequired>
+ <FormControl isRequired>
   <FormLabel>Service Type</FormLabel>
-  <Input
-    placeholder="Enter service type"
-    value={formData.serviceType}
-    onChange={e => handleChange("serviceType", e.target.value)}
-  />
+  {loadingServices ? (
+    <Spinner size="sm" />
+  ) : (
+    <Select
+      placeholder="Select service type"
+      value={formData.serviceType}
+      onChange={e => handleChange("serviceType", e.target.value)}
+    >
+      {serviceOptions.map(service => (
+        <option key={service.id} value={service.name}>
+          {service.name}
+        </option>
+      ))}
+    </Select>
+  )}
 </FormControl>
+
 
               <FormControl isRequired>
                 <FormLabel>Location</FormLabel>

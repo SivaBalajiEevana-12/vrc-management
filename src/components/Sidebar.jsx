@@ -24,6 +24,8 @@ const SidebarContent = ({ onClose }) => (
       { label: "Volunteer-Manager", path: "/Registeration" },
       { label: "Managers", path: "/manager" },
       { label: "Services", path: "/service-list" },
+      { label: "Scanner", path: "/scanner" },
+
     ].map(({ label, path }) => (
       <Box
         as={Link}
