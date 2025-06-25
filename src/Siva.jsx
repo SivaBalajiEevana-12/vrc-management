@@ -18,7 +18,7 @@ const Siva = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:3300/api/attendance")
+    fetch("https://vrc-server-production.up.railway.app/api/attendance")
       .then((res) => res.json())
       .then((data) => {
         setAttendanceData(data);
