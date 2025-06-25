@@ -22,6 +22,7 @@ import ServiceForm from './ServiceForm';
 import ServiceList from './ServiceList';
 import EventsList from './EventList';
 import QrAttendanceScanner from './QrAttendanceScanner';
+import Siva from './Siva';
 // import MinimalMeetupForm from './MinimalMeetupForm.JSX';
 // import MinimalMeetupForm from './MinimalMeetupForm';
 // import MinimalMeetupForm from './MinimalMeetupForm.JSX';
@@ -43,6 +44,7 @@ function App() {
       <Route path='/service-list' element={<ServiceList/>}/>
       <Route path='/event-list' element={<EventsList/>}/>
       <Route path='/scanner' element={<QrAttendanceScanner/>}/>
+      <Route path='/attendence' element={<Siva/>}/>
       </Routes>
    
     </ChakraProvider>

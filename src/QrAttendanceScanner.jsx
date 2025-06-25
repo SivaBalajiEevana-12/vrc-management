@@ -1,12 +1,22 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Box, Text, Button, Alert, AlertIcon, Spinner } from "@chakra-ui/react";
+import {
+  Box,
+  Text,
+  Button,
+  Alert,
+  AlertIcon,
+  Spinner,
+  useToast,
+} from "@chakra-ui/react";
 import { Html5Qrcode } from "html5-qrcode";
 
 const QrAttendanceScanner = () => {
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(false);
+  const [scanCompleted, setScanCompleted] = useState(false);
   const html5QrCodeRef = useRef(null);
   const isScanning = useRef(false);
+  const toast = useToast();
 
   const sendVerification = async (userId) => {
     setLoading(true);
@@ -15,14 +25,36 @@ const QrAttendanceScanner = () => {
       const data = await response.json();
       if (response.ok) {
         setStatus(`✅ ${data.message}`);
+        toast({
+          title: "Scan Successful",
+          description: data.message,
+          status: "success",
+          duration: 4000,
+          isClosable: true,
+        });
       } else {
         setStatus(`❌ ${data.message || "Verification failed."}`);
+        toast({
+          title: "Verification Failed",
+          description: data.message || "Invalid QR Code",
+          status: "error",
+          duration: 4000,
+          isClosable: true,
+        });
       }
     } catch (error) {
       console.error(error);
       setStatus("❌ Network error");
+      toast({
+        title: "Network Error",
+        description: "Could not verify the volunteer.",
+        status: "error",
+        duration: 4000,
+        isClosable: true,
+      });
     } finally {
       setLoading(false);
+      setScanCompleted(true);
     }
   };
 
@@ -40,23 +72,38 @@ const QrAttendanceScanner = () => {
 
             try {
               await scanner.stop();
+              await scanner.clear();
             } catch (e) {
               console.warn("Scanner stop failed:", e.message);
             }
 
-            // ✅ Extract userId from full URL
             try {
               const url = new URL(decodedText);
-              const pathParts = url.pathname.split('/');
+              const pathParts = url.pathname.split("/");
               const userId = pathParts[pathParts.length - 1];
-
               if (userId) {
                 await sendVerification(userId);
               } else {
                 setStatus("❌ Invalid QR code format.");
+                toast({
+                  title: "Invalid QR Code",
+                  description: "The scanned QR code is not in the expected format.",
+                  status: "error",
+                  duration: 4000,
+                  isClosable: true,
+                });
+                setScanCompleted(true);
               }
             } catch (err) {
               setStatus("❌ Invalid QR code.");
+              toast({
+                title: "Invalid QR Code",
+                description: "Could not parse QR code.",
+                status: "error",
+                duration: 4000,
+                isClosable: true,
+              });
+              setScanCompleted(true);
               console.error("URL parse error:", err.message);
             }
           }
@@ -70,7 +117,15 @@ const QrAttendanceScanner = () => {
       })
       .catch((err) => {
         setStatus("❌ Camera access error");
+        toast({
+          title: "Camera Error",
+          description: "Unable to access camera for scanning.",
+          status: "error",
+          duration: 4000,
+          isClosable: true,
+        });
         console.error("Start failed", err);
+        setScanCompleted(true);
       });
 
     return () => {
@@ -86,12 +141,20 @@ const QrAttendanceScanner = () => {
   }, []);
 
   return (
-    <Box maxW="md" mx="auto" mt={10} p={4} borderWidth="1px" borderRadius="xl" shadow="lg">
+    <Box
+      maxW="md"
+      mx="auto"
+      mt={10}
+      p={4}
+      borderWidth="1px"
+      borderRadius="xl"
+      shadow="lg"
+    >
       <Text fontSize="2xl" mb={4} fontWeight="bold" textAlign="center">
         Volunteer QR Attendance
       </Text>
 
-      <Box id="reader" width="100%" />
+      {!scanCompleted && <Box id="reader" width="100%" />}
 
       {loading && <Spinner mt={4} size="md" />}
       {status && (
@@ -101,9 +164,16 @@ const QrAttendanceScanner = () => {
         </Alert>
       )}
 
-      <Button mt={6} onClick={() => window.location.reload()} colorScheme="blue" width="full">
-        Scan Another
-      </Button>
+      {scanCompleted && (
+        <Button
+          mt={6}
+          onClick={() => window.location.reload()}
+          colorScheme="blue"
+          width="full"
+        >
+          Scan Another
+        </Button>
+      )}
     </Box>
   );
 };
