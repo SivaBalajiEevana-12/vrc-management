@@ -30,16 +30,20 @@ const Siva = () => {
       });
   }, []);
 
-  return (
-    <Layout>
-      <Box p={6} maxW="100%" overflowX="auto">
-        <Heading mb={6} size="lg" textAlign="center">
-          Volunteer Attendance Records
-        </Heading>
+return (
+  <Layout>
+    <Box p={6} maxW="100%" overflowX="auto">
+      <Heading mb={6} size="lg" textAlign="center">
+        Volunteer Attendance Records
+      </Heading>
 
-        {loading ? (
-          <Spinner size="xl" />
-        ) : (
+      {loading ? (
+        <Spinner size="xl" />
+      ) : (
+        <>
+          <Box mb={4} textAlign="center" fontWeight="semibold">
+            Total Attendance Records: {attendanceData.length}
+          </Box>
           <Table variant="simple" size="md">
             <Thead bg="gray.100">
               <Tr>
@@ -78,10 +82,12 @@ const Siva = () => {
               ))}
             </Tbody>
           </Table>
-        )}
-      </Box>
-    </Layout>
-  );
+        </>
+      )}
+    </Box>
+  </Layout>
+);
+
 };
 
 export default Siva;

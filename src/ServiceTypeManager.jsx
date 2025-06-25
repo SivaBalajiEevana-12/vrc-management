@@ -20,6 +20,7 @@ import {
   AlertDialogBody,
   AlertDialogFooter,
   Button,
+  Input, // 🆕
 } from "@chakra-ui/react"
 import Layout from "./components/Layout"
 
@@ -27,8 +28,9 @@ const ServiceTypeManager = () => {
   const [volunteers, setVolunteers] = useState([])
   const [serviceOptions, setServiceOptions] = useState([])
   const [loading, setLoading] = useState(true)
-  const [selectedUpdate, setSelectedUpdate] = useState(null) // { id, newType }
+  const [selectedUpdate, setSelectedUpdate] = useState(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [searchTerm, setSearchTerm] = useState("") // 🆕
   const cancelRef = useRef()
   const toast = useToast()
 
@@ -115,6 +117,11 @@ const ServiceTypeManager = () => {
     loadData()
   }, [])
 
+  // 🆕 Filtered volunteers by WhatsApp number
+  const filteredVolunteers = volunteers.filter((v) =>
+    v.whatsappNumber?.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+
   if (loading) {
     return (
       <ChakraProvider>
@@ -136,8 +143,16 @@ const ServiceTypeManager = () => {
               Volunteer Service Type Assignment
             </Heading>
 
+            {/* 🆕 Search Input */}
+            <Input
+              placeholder="Search by WhatsApp Number"
+              mb={6}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+
             <VStack spacing={6} align="stretch">
-              {volunteers.map((volunteer) => (
+              {filteredVolunteers.map((volunteer) => (
                 <Box
                   key={volunteer._id}
                   p={5}
@@ -150,7 +165,9 @@ const ServiceTypeManager = () => {
                     <Text fontWeight="bold">{volunteer.name}</Text>
                     <Text fontSize="sm">WhatsApp: {volunteer.whatsappNumber}</Text>
                     <Text fontSize="sm">Locality: {volunteer.currentLocality}</Text>
-                    <Text fontSize="sm">Service Availability: {volunteer.serviceAvailability}</Text>
+                    <Text fontSize="sm">
+                      Service Availability: {volunteer.serviceAvailability}
+                    </Text>
 
                     <Divider />
 
