@@ -53,16 +53,22 @@ const Siva = () => {
 
     if (serviceFilter !== "All") {
       updatedData = updatedData.filter(
-        (entry) => entry.volunteer?.serviceType === serviceFilter
+        (entry) => (entry.volunteer?.serviceType || "N/A") === serviceFilter
       );
     }
 
     if (searchTerm.trim()) {
       const term = searchTerm.toLowerCase();
       updatedData = updatedData.filter((entry) => {
-        const name = entry.volunteer?.name?.toLowerCase() || "";
-        const whatsapp = entry.volunteer?.whatsappNumber?.toLowerCase() || "";
-        const serviceType = entry.volunteer?.serviceType?.toLowerCase() || "";
+        const name = entry.volunteer?.name
+          ? entry.volunteer.name.toLowerCase()
+          : "n/a";
+        const whatsapp = entry.volunteer?.whatsappNumber
+          ? entry.volunteer.whatsappNumber.toLowerCase()
+          : "n/a";
+        const serviceType = entry.volunteer?.serviceType
+          ? entry.volunteer.serviceType.toLowerCase()
+          : "n/a";
         return (
           name.includes(term) ||
           whatsapp.includes(term) ||
@@ -75,7 +81,7 @@ const Siva = () => {
   }, [searchTerm, serviceFilter, attendanceData]);
 
   const uniqueServiceTypes = Array.from(
-    new Set(attendanceData.map((entry) => entry.volunteer?.serviceType || "Unknown"))
+    new Set(attendanceData.map((entry) => entry.volunteer?.serviceType || "N/A"))
   );
 
   return (
