@@ -15,6 +15,7 @@ import {
   Flex,
 } from "@chakra-ui/react";
 import Layout from "./components/Layout";
+import { useNavigate } from "react-router-dom";
 
 const Siva = () => {
   const [attendanceData, setAttendanceData] = useState([]);
@@ -23,6 +24,7 @@ const Siva = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [serviceFilter, setServiceFilter] = useState("All");
   const [serviceCounts, setServiceCounts] = useState({});
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetch("https://vrc-server-production.up.railway.app/api/attendance")
@@ -42,7 +44,7 @@ const Siva = () => {
   const countServiceTypes = (data) => {
     const counts = {};
     data.forEach((entry) => {
-      const type = entry.volunteer?.serviceType || "Unknown";
+      const type = entry.volunteer?.serviceType || "N/A";
       counts[type] = (counts[type] || 0) + 1;
     });
     setServiceCounts(counts);
@@ -53,22 +55,18 @@ const Siva = () => {
 
     if (serviceFilter !== "All") {
       updatedData = updatedData.filter(
-        (entry) => (entry.volunteer?.serviceType || "N/A") === serviceFilter
+        (entry) =>
+          (entry.volunteer?.serviceType || "N/A") === serviceFilter
       );
     }
 
     if (searchTerm.trim()) {
       const term = searchTerm.toLowerCase();
       updatedData = updatedData.filter((entry) => {
-        const name = entry.volunteer?.name
-          ? entry.volunteer.name.toLowerCase()
-          : "n/a";
-        const whatsapp = entry.volunteer?.whatsappNumber
-          ? entry.volunteer.whatsappNumber.toLowerCase()
-          : "n/a";
-        const serviceType = entry.volunteer?.serviceType
-          ? entry.volunteer.serviceType.toLowerCase()
-          : "n/a";
+        const name = entry.volunteer?.name?.toLowerCase() || "";
+        const whatsapp = entry.volunteer?.whatsappNumber?.toLowerCase() || "";
+        const serviceType =
+          entry.volunteer?.serviceType?.toLowerCase() || "";
         return (
           name.includes(term) ||
           whatsapp.includes(term) ||
@@ -81,7 +79,9 @@ const Siva = () => {
   }, [searchTerm, serviceFilter, attendanceData]);
 
   const uniqueServiceTypes = Array.from(
-    new Set(attendanceData.map((entry) => entry.volunteer?.serviceType || "N/A"))
+    new Set(
+      attendanceData.map((entry) => entry.volunteer?.serviceType || "N/A")
+    )
   );
 
   return (
@@ -153,7 +153,16 @@ const Siva = () => {
               <Tbody>
                 {filteredData.map((entry) => (
                   <Tr key={entry._id}>
-                    <Td>{entry.volunteer?.name || "N/A"}</Td>
+                    <Td
+                      color="teal.600"
+                      fontWeight="bold"
+                      cursor="pointer"
+                      onClick={() =>
+                        navigate(`/service/${entry.volunteer?._id}`)
+                      }
+                    >
+                      {entry.volunteer?.name || "N/A"}
+                    </Td>
                     <Td>{entry.volunteer?.whatsappNumber || "N/A"}</Td>
                     <Td>{entry.volunteer?.serviceType || "N/A"}</Td>
                     <Td>
@@ -166,7 +175,7 @@ const Siva = () => {
                             : "gray"
                         }
                       >
-                        {entry.status}
+                        {entry.status || "N/A"}
                       </Badge>
                     </Td>
                     <Td>
