@@ -36,7 +36,7 @@ const ServiceTypeManager = () => {
 
   const fetchVolunteers = async () => {
     try {
-      const res = await fetch("https://vrc-server-production.up.railway.app")
+      const res = await fetch("https://vrc-server-110406681774.asia-south1.run.app")
       const data = await res.json()
       setVolunteers(data)
     } catch (error) {
@@ -53,7 +53,7 @@ const ServiceTypeManager = () => {
 
   const fetchServices = async () => {
     try {
-      const res = await fetch("https://vrc-server-production.up.railway.app/service")
+      const res = await fetch("https://vrc-server-110406681774.asia-south1.run.app/service")
       const data = await res.json()
       setServiceOptions(data)
     } catch (error) {
@@ -76,7 +76,7 @@ const ServiceTypeManager = () => {
   const performUpdate = async () => {
     const { id, newType } = selectedUpdate
     try {
-      await fetch(`https://vrc-server-production.up.railway.app/${id}`, {
+      await fetch(`https://vrc-server-110406681774.asia-south1.run.app/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ serviceType: newType }),

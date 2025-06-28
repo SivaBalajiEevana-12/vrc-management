@@ -36,7 +36,7 @@ export default function VolunteerRegistrationForm() {
   useEffect(() => {
     const fetchServices = async () => {
       try {
-        const res = await fetch("https://vrc-server-production.up.railway.app/service")
+        const res = await fetch("https://vrc-server-110406681774.asia-south1.run.app/service")
         if (!res.ok) throw new Error("Failed to fetch services")
         const data = await res.json()
         setServiceOptions(data)
@@ -75,7 +75,7 @@ export default function VolunteerRegistrationForm() {
   }
 
   try {
-    const res = await fetch("http://localhost:3300/register-volunteer", {
+    const res = await fetch("http://localhost:3300https://vrc-server-110406681774.asia-south1.run.app/register-volunteer", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(formData),

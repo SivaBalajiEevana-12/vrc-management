@@ -27,7 +27,7 @@ const Siva = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch("https://vrc-server-production.up.railway.app/api/attendance")
+    fetch("https://vrc-server-110406681774.asia-south1.run.app/api/attendance")
       .then((res) => res.json())
       .then((data) => {
         setAttendanceData(data);

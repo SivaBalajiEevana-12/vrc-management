@@ -85,7 +85,7 @@ function Registeration() {
           whatsappNumber: `91${formData.whatsappNumber}`,
         }
 
-        const response = await fetch("https://vrc-server-production.up.railway.app/user", {
+        const response = await fetch("https://vrc-server-110406681774.asia-south1.run.app/user", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

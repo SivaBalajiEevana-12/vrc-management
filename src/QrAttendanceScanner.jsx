@@ -21,7 +21,7 @@ const QrAttendanceScanner = () => {
   const sendVerification = async (userId) => {
     setLoading(true);
     try {
-      const response = await fetch(`https://vrc-server-production.up.railway.app/verify/${userId}`);
+      const response = await fetch(`https://vrc-server-110406681774.asia-south1.run.app/verify/${userId}`);
       const data = await response.json();
       if (response.ok) {
         setStatus(`✅ ${data.message}`);

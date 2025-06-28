@@ -44,7 +44,7 @@ const handleSubmit = async () => {
       isClosable: true,
     });
   try {
-    const response = await fetch("https://vrc-server-production.up.railway.app/events", {
+    const response = await fetch("https://vrc-server-110406681774.asia-south1.run.app/events", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

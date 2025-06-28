@@ -43,7 +43,7 @@ export default function VolunteerDashboard() {
     const fetchVolunteers = async () => {
       try {
         setLoading(true)
-        const response = await fetch("https://vrc-server-production.up.railway.app")
+        const response = await fetch("https://vrc-server-110406681774.asia-south1.run.app")
 
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
 
@@ -99,7 +99,7 @@ export default function VolunteerDashboard() {
     if (!confirm) return
 
     try {
-      const res = await fetch(`https://vrc-server-production.up.railway.app/user/${id}`, {
+      const res = await fetch(`https://vrc-server-110406681774.asia-south1.run.app/user/${id}`, {
         method: "DELETE"
       })
 
@@ -258,7 +258,7 @@ export default function VolunteerDashboard() {
             mt={4}
             onClick={async () => {
               try {
-                const res = await fetch("https://vrc-server-production.up.railway.app/send-notification", {
+                const res = await fetch("https://vrc-server-110406681774.asia-south1.run.app/send-notification", {
                   method: "POST"
                 })
                 if (!res.ok) throw new Error("Failed to send notifications")

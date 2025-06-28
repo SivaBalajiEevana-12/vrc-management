@@ -24,6 +24,9 @@ import EventsList from './EventList';
 import QrAttendanceScanner from './QrAttendanceScanner';
 import Siva from './Siva';
 import Balaji from './Balaji';
+import ProjectList from './ProjectList';
+import ProjectCreateForm from './project/ProjectCreateForm';
+import ProjectDetails from './project/ProjectDetails';
 // import MinimalMeetupForm from './MinimalMeetupForm.JSX';
 // import MinimalMeetupForm from './MinimalMeetupForm';
 // import MinimalMeetupForm from './MinimalMeetupForm.JSX';
@@ -47,6 +50,10 @@ function App() {
       <Route path='/scanner' element={<QrAttendanceScanner/>}/>
       <Route path='/attendence' element={<Siva/>}/>
       <Route path='/service/:id?' element={<Balaji />} />
+      <Route path='/project' element={<ProjectList />} />
+      <Route path='/create/project' element={<ProjectCreateForm />} />
+      <Route path='/project/:id' element={<ProjectDetails />} />
+
 
       </Routes>
    

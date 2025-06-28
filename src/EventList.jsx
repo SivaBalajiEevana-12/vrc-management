@@ -22,7 +22,7 @@ export default function EventsList() {
 
   const fetchEvents = async () => {
     try {
-      const res = await fetch("https://vrc-server-production.up.railway.app/events")
+      const res = await fetch("https://vrc-server-110406681774.asia-south1.run.app/events")
       const data = await res.json()
       setEvents(data)
       setLoading(false)
@@ -42,7 +42,7 @@ export default function EventsList() {
     if (!confirmed) return
 
     try {
-      const res = await fetch(`https://vrc-server-production.up.railway.app/events/${id}`, {
+      const res = await fetch(`https://vrc-server-110406681774.asia-south1.run.app/events/${id}`, {
         method: "DELETE",
       })
       if (!res.ok) throw new Error("Failed to delete event")

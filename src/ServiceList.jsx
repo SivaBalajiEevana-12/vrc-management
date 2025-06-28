@@ -20,7 +20,7 @@ const ServiceList = () => {
 
   const fetchServices = async () => {
     try {
-      const res = await fetch('https://vrc-server-production.up.railway.app/service');
+      const res = await fetch('https://vrc-server-110406681774.asia-south1.run.app/service');
       const data = await res.json();
       setServices(data);
       console.log('Fetched services:', data); 
@@ -42,7 +42,7 @@ const ServiceList = () => {
 
   const deleteService = async (id) => {
     try {
-      const res = await fetch(`https://vrc-server-production.up.railway.app/service/${id}`, {
+      const res = await fetch(`https://vrc-server-110406681774.asia-south1.run.app/service/${id}`, {
         method: 'DELETE',
       });
 

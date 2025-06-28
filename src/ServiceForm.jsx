@@ -19,7 +19,7 @@ const ServiceForm = () => {
     e.preventDefault();
 
     try {
-      const res = await fetch('https://vrc-server-production.up.railway.app/service', {
+      const res = await fetch('https://vrc-server-110406681774.asia-south1.run.app/service', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, reportingTime }),
