@@ -25,6 +25,7 @@ const SidebarContent = ({ onClose }) => (
       { label: "Managers", path: "/manager" },
       { label: "Services", path: "/service-list" },
       { label: "Attendance", path: "/attendence" },
+      { label: "FLC-Attendance", path: "/fcuser/attendece" },
      
 
     ].map(({ label, path }) => (

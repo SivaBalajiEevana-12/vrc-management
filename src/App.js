@@ -27,6 +27,7 @@ import Balaji from './Balaji';
 import ProjectList from './ProjectList';
 import ProjectCreateForm from './project/ProjectCreateForm';
 import ProjectDetails from './project/ProjectDetails';
+import StatusUsers from './StatusUsers';
 // import MinimalMeetupForm from './MinimalMeetupForm.JSX';
 // import MinimalMeetupForm from './MinimalMeetupForm';
 // import MinimalMeetupForm from './MinimalMeetupForm.JSX';
@@ -53,6 +54,7 @@ function App() {
       <Route path='/project' element={<ProjectList />} />
       <Route path='/create/project' element={<ProjectCreateForm />} />
       <Route path='/project/:id' element={<ProjectDetails />} />
+      <Route path='/fcuser/attendece' element={<StatusUsers/>} />
 
 
       </Routes>
