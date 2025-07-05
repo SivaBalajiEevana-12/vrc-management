@@ -14,7 +14,7 @@ import { Link } from "react-router-dom";
 const SidebarContent = ({ onClose }) => (
   <VStack align="stretch" spacing="2" p="3">
     <Text fontSize="2xl" fontWeight="bold" mb="6" textAlign="center">
-      VSM-Volunteer
+      Vcc-Volunteer
     </Text>
 
     {[
@@ -26,6 +26,8 @@ const SidebarContent = ({ onClose }) => (
       { label: "Services", path: "/service-list" },
       { label: "Attendance", path: "/attendence" },
       { label: "FLC-Attendance", path: "/fcuser/attendece" },
+      { label: "Bahuda Ratha Yatra-Attendance", path: "/july/user/attendece" },
+
      
 
     ].map(({ label, path }) => (
