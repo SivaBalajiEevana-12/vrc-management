@@ -107,7 +107,7 @@ const VolunteerForm = () => {
       payload.tshirtSize = formData.tShirtSize;
       delete payload.tShirtSize;
 
-      await axios.post('http://localhost:3300/volunteerform/api/volunteers', payload);
+      await axios.post('https://vrc-server-110406681774.asia-south1.run.app/volunteerform/api/volunteers', payload);
       toast({ title: 'Success', description: 'Volunteer registered.', status: 'success', duration: 3000 });
       setFormData({
         name: '', whatsappNumber: '', dateOfBirth: '', age: '', gender: '', maritalStatus: '', profession: '',

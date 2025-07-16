@@ -34,7 +34,7 @@ const VolunteerTableWithModal = () => {
 
   useEffect(() => {
     axios
-      .get('http://localhost:3300/volunteerform/api/volunteers')
+      .get('https://vrc-server-110406681774.asia-south1.run.app/volunteerform/api/volunteers')
       .then((res) => {
         const cleanedData = res.data.filter((v) => v && v.name);
         setVolunteers(cleanedData);
