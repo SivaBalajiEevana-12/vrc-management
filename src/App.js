@@ -30,6 +30,8 @@ import ProjectDetails from './project/ProjectDetails';
 import StatusUsers from './StatusUsers';
 import July from './July';
 import UserTable from './UsersTable';
+import VolunteerTableWithModal from './project/volunteerTable';
+import VolunteerForm from './project/VolunteerForm';
 // import MinimalMeetupForm from './MinimalMeetupForm.JSX';
 // import MinimalMeetupForm from './MinimalMeetupForm';
 // import MinimalMeetupForm from './MinimalMeetupForm.JSX';
@@ -44,7 +46,7 @@ function App() {
       {/* <Route path='/' element={ <Registeration/>}/> */}
       <Route path='/service' element={ <ServiceTypeManager/>}/>
       <Route path='/meetup' element={ <MinimalMeetupForm1/>}/>
-      <Route path='/' element={ <VolunteerDashboard/>}/>
+      <Route path='/' element={ <VolunteerTableWithModal/>}/>
       <Route path='/Registeration' element={<VolunteerRegistrationForm/>}/>
       <Route path='/manager' element={<ManagerList/>}/>
       <Route path='/post-service' element={<ServiceForm/>}/>
@@ -59,6 +61,7 @@ function App() {
       <Route path='/fcuser/attendece' element={<StatusUsers/>} />
       <Route path='/july/user/attendece' element={<July/>} />
       <Route path='/july/flc/attendece' element={<UserTable/>} />
+      <Route path='/volunteerform' element={<VolunteerForm/>}/>
 
 
       </Routes>
