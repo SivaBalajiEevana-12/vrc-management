@@ -29,6 +29,7 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import axios from 'axios';
+import Layout from '../components/Layout';
 
 const VolunteerTableWithModal = () => {
   const [volunteers, setVolunteers] = useState([]);
@@ -146,6 +147,7 @@ const VolunteerTableWithModal = () => {
   };
 
   return (
+    <Layout>
     <Box p={6} overflowX="auto">
       <HStack spacing={4} mb={4} flexWrap="wrap">
         <Input
@@ -306,6 +308,7 @@ const VolunteerTableWithModal = () => {
       </Modal>
       )}
     </Box>
+    </Layout>
   );
 };
 
