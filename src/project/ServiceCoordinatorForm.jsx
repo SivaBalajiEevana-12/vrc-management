@@ -31,7 +31,7 @@ const ServiceCoordinatorForm = () => {
         coordinatorName,
         coordinatorNumber,
       };
-      await axios.post('http://localhost:3300/servicecoordinator/api/add', data);
+      await axios.post('https://vrc-server-110406681774.asia-south1.run.app/servicecoordinator/api/add', data);
       toast({ title: 'Success', description: 'Service and Coordinator added!', status: 'success', duration: 3000 });
       setServiceName('');
       setCoordinatorName('');

@@ -31,7 +31,7 @@ const ProjectCreateForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:3300/register/project", formData); // adjust endpoint as needed
+      await axios.post("https://vrc-server-110406681774.asia-south1.run.app/register/project", formData); // adjust endpoint as needed
       toast({
         title: "Project created.",
         status: "success",

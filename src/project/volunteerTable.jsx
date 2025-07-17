@@ -58,7 +58,7 @@ const VolunteerTableWithModal = () => {
 
   useEffect(() => {
     axios
-      .get('http://localhost:3300/servicecoordinator')
+      .get('https://vrc-server-110406681774.asia-south1.run.app/servicecoordinator')
       .then((res) => {
         setServiceCoordinators(res.data);
       })
@@ -103,7 +103,7 @@ const VolunteerTableWithModal = () => {
     setAssigning((prev) => ({ ...prev, [volunteerId]: true }));
     try {
       await axios.patch(
-        `http://localhost:3300/volunteerform/api/volunteers/${volunteerId}`,
+        `https://vrc-server-110406681774.asia-south1.run.app/volunteerform/api/volunteers/${volunteerId}`,
         { assignedService: serviceId }
       );
 

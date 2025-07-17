@@ -23,7 +23,7 @@ const ProjectDetails = () => {
     const fetchProject = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:3300/register/project/${id}`
+          `https://vrc-server-110406681774.asia-south1.run.app/register/project/${id}`
         );
         setProject(res.data);
       } catch (err) {
