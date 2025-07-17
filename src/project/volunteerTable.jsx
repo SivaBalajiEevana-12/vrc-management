@@ -1,3 +1,5 @@
+import Sidebar from '../components/Sidebar';
+
 import React, { useEffect, useState } from 'react';
 import {
   Box,
@@ -21,7 +23,10 @@ import {
   Badge,
   Input,
   Select,
-  HStack
+  HStack,
+  Avatar,
+  Spinner,
+  useToast,
 } from '@chakra-ui/react';
 import axios from 'axios';
 
@@ -31,6 +36,12 @@ const VolunteerTableWithModal = () => {
   const [selectedVolunteer, setSelectedVolunteer] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [filters, setFilters] = useState({ name: '', whatsapp: '', slot: '' });
+  const [serviceCoordinators, setServiceCoordinators] = useState([]);
+  const [assigning, setAssigning] = useState({});
+  const toast = useToast();
+
+
+  const [serviceSelection, setServiceSelection] = useState({});
 
   useEffect(() => {
     axios
@@ -39,6 +50,16 @@ const VolunteerTableWithModal = () => {
         const cleanedData = res.data.filter((v) => v && v.name);
         setVolunteers(cleanedData);
         setFilteredVolunteers(cleanedData);
+      })
+      .catch((err) => console.error(err));
+  }, []);
+
+
+  useEffect(() => {
+    axios
+      .get('http://localhost:3300/servicecoordinator')
+      .then((res) => {
+        setServiceCoordinators(res.data);
       })
       .catch((err) => console.error(err));
   }, []);
@@ -58,6 +79,70 @@ const VolunteerTableWithModal = () => {
   const handleRowClick = (volunteer) => {
     setSelectedVolunteer(volunteer);
     onOpen();
+  };
+
+  const handleServiceChange = (volId, value) => {
+    setServiceSelection((prev) => ({
+      ...prev,
+      [volId]: value,
+    }));
+  };
+
+  const handleAssignService = async (volunteerId) => {
+    const serviceId = serviceSelection[volunteerId];
+    if (!serviceId) {
+      toast({
+        title: "Error",
+        description: "Select a service before updating.",
+        status: "error",
+        duration: 2500,
+      });
+      return;
+    }
+    setAssigning((prev) => ({ ...prev, [volunteerId]: true }));
+    try {
+      await axios.patch(
+        `http://localhost:3300/volunteerform/api/volunteers/${volunteerId}`,
+        { assignedService: serviceId }
+      );
+
+
+      setVolunteers((prev) =>
+        prev.map((v) =>
+          v._id === volunteerId
+            ? { ...v, assignedService: serviceId }
+            : v
+        )
+      );
+      setFilteredVolunteers((prev) =>
+        prev.map((v) =>
+          v._id === volunteerId
+            ? { ...v, assignedService: serviceId }
+            : v
+        )
+      );
+
+      toast({
+        title: "Success",
+        description: "Assigned service coordinator updated.",
+        status: "success",
+        duration: 2000,
+      });
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: err.response?.data?.message || "Failed to update.",
+        status: "error",
+        duration: 3000,
+      });
+    }
+    setAssigning((prev) => ({ ...prev, [volunteerId]: false }));
+  };
+
+
+  const getServiceName = (serviceId) => {
+    const found = serviceCoordinators.find((s) => s._id === serviceId);
+    return found ? found.serviceName : '';
   };
 
   return (
@@ -91,21 +176,63 @@ const VolunteerTableWithModal = () => {
       <Table variant="simple" size="md">
         <Thead bg="teal.500">
           <Tr>
+            <Th color="white">Image</Th>
             <Th color="white">Name</Th>
             <Th color="white">WhatsApp</Th>
             <Th color="white">Gender</Th>
             <Th color="white">Age</Th>
             <Th color="white">T-Shirt Size</Th>
+            <Th color="white">Assigned Service</Th>
+            <Th color="white">Assign</Th>
           </Tr>
         </Thead>
         <Tbody>
           {filteredVolunteers.map((volunteer) => (
-            <Tr key={volunteer._id} onClick={() => handleRowClick(volunteer)} _hover={{ bg: 'gray.100', cursor: 'pointer' }}>
-              <Td>{volunteer.name}</Td>
-              <Td>{volunteer.whatsappNumber}</Td>
-              <Td>{volunteer.gender}</Td>
-              <Td>{volunteer.age}</Td>
-              <Td>{volunteer.tshirtSize || '-'}</Td>
+            <Tr key={volunteer._id} _hover={{ bg: 'gray.100', cursor: 'pointer' }}>
+              <Td>
+                {volunteer.imageUrl ? (
+                  <Avatar size="xl" name={volunteer.name} src={volunteer.imageUrl} />
+                ) : (
+                  <Avatar size="xl" name={volunteer.name} />
+                )}
+              </Td>
+              <Td onClick={() => handleRowClick(volunteer)}>{volunteer.name}</Td>
+              <Td onClick={() => handleRowClick(volunteer)}>{volunteer.whatsappNumber}</Td>
+              <Td onClick={() => handleRowClick(volunteer)}>{volunteer.gender}</Td>
+              <Td onClick={() => handleRowClick(volunteer)}>{volunteer.age}</Td>
+              <Td onClick={() => handleRowClick(volunteer)}>{volunteer.tshirtSize || '-'}</Td>
+              <Td>
+                {getServiceName(volunteer.assignedService) || (
+                  <Badge colorScheme="gray">Unassigned</Badge>
+                )}
+              </Td>
+              <Td>
+                <HStack>
+                  <Select
+                    placeholder="Assign Service"
+                    size="sm"
+                    maxW="140px"
+                    value={serviceSelection[volunteer._id] || ''}
+                    onChange={(e) =>
+                      handleServiceChange(volunteer._id, e.target.value)
+                    }
+                  >
+                    {serviceCoordinators.map((svc) => (
+                      <option key={svc._id} value={svc._id}>
+                        {svc.serviceName}
+                      </option>
+                    ))}
+                  </Select>
+                  <Button
+                    colorScheme="teal"
+                    size="sm"
+                    onClick={() => handleAssignService(volunteer._id)}
+                    isLoading={assigning[volunteer._id]}
+                  >
+                    Update
+                  </Button>
+                </HStack>
+              </Td>
             </Tr>
           ))}
         </Tbody>
@@ -113,42 +240,70 @@ const VolunteerTableWithModal = () => {
 
       {selectedVolunteer && (
         <Modal isOpen={isOpen} onClose={onClose} size="xl" isCentered motionPreset="scale">
-          <ModalOverlay backdropFilter="blur(6px) hue-rotate(30deg)" />
-          <ModalContent borderRadius="2xl" bgGradient="linear(to-br, white, teal.50)" boxShadow="2xl">
-            <ModalHeader color="teal.700" fontSize="2xl">Volunteer Details</ModalHeader>
-            <ModalCloseButton color="gray.600" />
-            <ModalBody>
-              <VStack align="start" spacing={3} fontSize="md">
-                <Text><strong>Name:</strong> {selectedVolunteer.name}</Text>
-                <Text><strong>WhatsApp:</strong> {selectedVolunteer.whatsappNumber}</Text>
-                <Text><strong>DOB:</strong> {new Date(selectedVolunteer.dateOfBirth).toLocaleDateString()}</Text>
-                <Text><strong>Gender:</strong> {selectedVolunteer.gender}</Text>
-                <Text><strong>Age:</strong> {selectedVolunteer.age}</Text>
-                <Text><strong>Marital Status:</strong> {selectedVolunteer.maritalStatus || '-'}</Text>
-                <Text><strong>Profession:</strong> {selectedVolunteer.profession || '-'}</Text>
-                <Text><strong>College/Company:</strong> {selectedVolunteer.collegeOrCompany || '-'}</Text>
-                <Text><strong>Locality:</strong> {selectedVolunteer.locality || '-'}</Text>
-                <Text><strong>Referred By:</strong> {selectedVolunteer.referredBy}</Text>
-                <Text><strong>Info Source:</strong> {selectedVolunteer.infoSource}</Text>
-                <Text><strong>T-Shirt Size:</strong> {selectedVolunteer.tshirtSize || '-'}</Text>
-                <Text><strong>Accommodation:</strong> {selectedVolunteer.needAccommodation || '-'}</Text>
-                <Box>
-                  <Text><strong>Service Availability:</strong></Text>
-                  {selectedVolunteer.serviceAvailability.map((slot) => (
-                    <Badge key={slot._id} colorScheme="teal" mr={2} mt={1}>
-                      {slot.date} - {slot.timeSlot}
-                    </Badge>
-                  ))}
-                </Box>
-              </VStack>
-            </ModalBody>
-            <ModalFooter>
-              <Button colorScheme="teal" onClick={onClose} borderRadius="full">
-                Close
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
+        <ModalOverlay backdropFilter="blur(6px) hue-rotate(30deg)" />
+        <ModalContent borderRadius="2xl" bgGradient="linear(to-br, white, teal.50)" boxShadow="2xl">
+          <ModalHeader color="teal.700" fontSize="2xl">Volunteer Details</ModalHeader>
+          <ModalCloseButton color="gray.600" />
+          <ModalBody>
+            <VStack align="start" spacing={3} fontSize="md">
+              <Text><strong>Name:</strong> {selectedVolunteer.name}</Text>
+              <Text><strong>WhatsApp:</strong> {selectedVolunteer.whatsappNumber}</Text>
+              <Text><strong>DOB:</strong> {new Date(selectedVolunteer.dateOfBirth).toLocaleDateString()}</Text>
+              <Text><strong>Gender:</strong> {selectedVolunteer.gender}</Text>
+              <Text><strong>Age:</strong> {selectedVolunteer.age}</Text>
+              <Text><strong>Marital Status:</strong> {selectedVolunteer.maritalStatus || '-'}</Text>
+              <Text><strong>Profession:</strong> {selectedVolunteer.profession || '-'}</Text>
+              <Text><strong>College/Company:</strong> {selectedVolunteer.collegeOrCompany || '-'}</Text>
+              <Text><strong>Locality:</strong> {selectedVolunteer.locality || '-'}</Text>
+              <Text><strong>Referred By:</strong> {selectedVolunteer.referredBy}</Text>
+              <Text><strong>Info Source:</strong> {selectedVolunteer.infoSource}</Text>
+              <Text><strong>T-Shirt Size:</strong> {selectedVolunteer.tshirtSize || '-'}</Text>
+              <Text><strong>Accommodation:</strong> {selectedVolunteer.needAccommodation || '-'}</Text>
+              <Box>
+                <Text><strong>Service Availability:</strong></Text>
+                {selectedVolunteer.serviceAvailability.map((slot) => (
+                  <Badge key={slot._id || slot.date + slot.timeSlot} colorScheme="teal" mr={2} mt={1}>
+                    {slot.date} - {slot.timeSlot}
+                  </Badge>
+                ))}
+              </Box>
+              <Box>
+                <Text><strong>Assigned Service:</strong></Text>
+                {(() => {
+                 
+                  const svc = serviceCoordinators.find(
+                    (s) => s._id === selectedVolunteer.assignedService
+                  );
+                  if (svc) {
+                    return (
+                      <VStack align="start" spacing={1}>
+                        <Badge colorScheme="green" fontSize="lg">{svc.serviceName}</Badge>
+                        <Text><strong>Coordinator Name:</strong> {svc.coordinatorName}</Text>
+                        <Text><strong>Coordinator Number:</strong> {svc.coordinatorNumber}</Text>
+                      </VStack>
+                    );
+                  } else {
+                    return <Badge colorScheme="gray">Unassigned</Badge>;
+                  }
+                })()}
+              </Box>
+              <Box>
+                <Text><strong>Photo:</strong></Text>
+                {selectedVolunteer.imageUrl ? (
+                  <Avatar size="xl" name={selectedVolunteer.name} src={selectedVolunteer.imageUrl} />
+                ) : (
+                  <Avatar size="xl" name={selectedVolunteer.name} />
+                )}
+              </Box>
+            </VStack>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="teal" onClick={onClose} borderRadius="full">
+              Close
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
       )}
     </Box>
   );

@@ -32,6 +32,7 @@ import July from './July';
 import UserTable from './UsersTable';
 import VolunteerTableWithModal from './project/volunteerTable';
 import VolunteerForm from './project/VolunteerForm';
+import ServiceCoordinatorForm from './project/ServiceCoordinatorForm';
 // import MinimalMeetupForm from './MinimalMeetupForm.JSX';
 // import MinimalMeetupForm from './MinimalMeetupForm';
 // import MinimalMeetupForm from './MinimalMeetupForm.JSX';
@@ -62,6 +63,7 @@ function App() {
       <Route path='/july/user/attendece' element={<July/>} />
       <Route path='/july/flc/attendece' element={<UserTable/>} />
       <Route path='/volunteerform' element={<VolunteerForm/>}/>
+      <Route path='/servicecoordinatorform' element={<ServiceCoordinatorForm/>}/>
 
 
       </Routes>

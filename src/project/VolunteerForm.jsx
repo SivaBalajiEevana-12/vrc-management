@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   Box,
   VStack,
@@ -10,21 +10,46 @@ import {
   Stack,
   RadioGroup,
   Radio,
-  useToast
+  useToast,
+  FormControl,
+  FormLabel,
+  SimpleGrid,
+  Spinner,
+  Center,
 } from '@chakra-ui/react';
-// import { FormControl, FormLabel } from '@chakra-ui/form-control';
-// ✅ Correct
-import { FormControl, FormLabel, FormErrorMessage } from '@chakra-ui/react';
 import axios from 'axios';
-
+import Webcam from 'react-webcam';
 
 const devotees = [
   { name: 'Sitanatha Dasa', img: 'https://www.harekrishnavizag.org/assets/img/about_1.jpg' },
   { name: 'Rama Dasa', img: 'https://www.harekrishnavizag.org/assets/img/about_1.jpg' },
   { name: 'Gauranga Dasa', img: 'https://www.harekrishnavizag.org/assets/img/about_1.jpg' },
   { name: 'mani teja prabhu', img: 'https://www.harekrishnavizag.org/assets/img/about_1.jpg' },
-  { name: 'Not associated ', img: 'https://www.harekrishnavizag.org/assets/img/about_1.jpg' },
- 
+  { name: 'Not associated', img: 'https://www.harekrishnavizag.org/assets/img/about_1.jpg' },
+  { name: 'Niskinchana Bhakta Dasa', img: 'https://www.harekrishnavizag.org/assets/img/about_1.jpg' },
+  { name: 'Yaduraja Dasa', img: 'https://www.harekrishnavizag.org/assets/img/about_1.jpg' },
+  { name: 'Vaikunteswara Dasa', img: 'https://www.harekrishnavizag.org/assets/img/about_1.jpg' },
+  { name: 'Ambarisha Dasa', img: 'https://www.harekrishnavizag.org/assets/img/about_1.jpg' },
+  { name: 'Sruthisagar Dasa', img: 'https://www.harekrishnavizag.org/assets/img/about_1.jpg' },
+  { name: 'Shyam Mashav Dasa', img: 'https://www.harekrishnavizag.org/assets/img/about_1.jpg' },
+  { name: 'Jitaamitra Dasa', img: 'https://www.harekrishnavizag.org/assets/img/about_1.jpg' },
+  { name: 'Keshav Kripa Dasa', img: 'https://www.harekrishnavizag.org/assets/img/about_1.jpg' },
+  { name: 'Gopeswara Dasa', img: 'https://www.harekrishnavizag.org/assets/img/about_1.jpg' },
+  { name: 'Adhokshaja Dasa', img: 'https://www.harekrishnavizag.org/assets/img/about_1.jpg' },
+  { name: 'Ranveer Rama Dasa', img: 'https://www.harekrishnavizag.org/assets/img/about_1.jpg' },
+  { name: 'Gadadhara Dasa', img: 'https://www.harekrishnavizag.org/assets/img/about_1.jpg' },
+  { name: 'Shadgoswami Dasa', img: 'https://www.harekrishnavizag.org/assets/img/about_1.jpg' },
+  { name: 'Ishan Krishna Dasa', img: 'https://www.harekrishnavizag.org/assets/img/about_1.jpg' },
+  { name: 'Others', img: 'https://www.harekrishnavizag.org/assets/img/about_1.jpg' },
+];
+
+
+const dates = ["August 14", "August 15", "August 16", "August 17"];
+const timeSlots = [
+  { label: "9am to 9pm (Full Day)", value: "Full Day" },
+  { label: "2pm to 9pm (Half Day)", value: "Half Day 2pm" },
+  { label: "4pm to 9pm(Half Day)", value: "Half Day 4pm" },
+  { label: "Not Possible this day", value: "Not Possible " }
 ];
 
 const VolunteerForm = () => {
@@ -45,6 +70,11 @@ const VolunteerForm = () => {
     needAccommodation: ''
   });
 
+  const [image, setImage] = useState(null); 
+  const [imageFile, setImageFile] = useState(null); 
+  const webcamRef = useRef(null);
+
+  const [loading, setLoading] = useState(false); 
   const toast = useToast();
 
   const isYoungBoy = Number(formData.age) > 0 && Number(formData.age) < 30 && formData.gender === 'Male';
@@ -60,6 +90,24 @@ const VolunteerForm = () => {
     setFormData((prev) => ({ ...prev, serviceAvailability: updated }));
   };
 
+
+  const capture = React.useCallback(() => {
+    const imageSrc = webcamRef.current.getScreenshot();
+    setImage(imageSrc);
+
+    fetch(imageSrc)
+      .then(res => res.blob())
+      .then(blob => {
+        const file = new File([blob], 'photo.png', { type: 'image/png' });
+        setImageFile(file);
+      });
+  }, [webcamRef]);
+
+  const handleRetake = () => {
+    setImage(null);
+    setImageFile(null);
+  };
+
   const validateForm = () => {
     if (!formData.name.trim()) return 'Name is required';
     if (!formData.whatsappNumber.trim()) return 'WhatsApp Number is required';
@@ -72,6 +120,8 @@ const VolunteerForm = () => {
     if (isYoungBoy && !formData.collegeOrCompany.trim()) return 'College or Company name is required';
     if (isFullDayVolunteer && !formData.tShirtSize) return 'T-Shirt Size is required';
     if (isFullDayVolunteer && !formData.needAccommodation) return 'Accommodation info is required';
+
+    if (!imageFile) return 'Photo is required. Please capture your photo below.';
     return null;
   };
 
@@ -82,6 +132,7 @@ const VolunteerForm = () => {
       return;
     }
 
+    setLoading(true); 
     try {
       const payload = { ...formData };
 
@@ -90,12 +141,10 @@ const VolunteerForm = () => {
         delete payload.maritalStatus;
         delete payload.collegeOrCompany;
       }
-
       if (!isFullDayVolunteer) {
         delete payload.tShirtSize;
         delete payload.needAccommodation;
       }
-
       if (!payload.profession && isYoungBoy) payload.profession = 'Student';
       if (!payload.infoSource) payload.infoSource = 'Other';
       payload.referredBy = formData.contactPerson || 'Other';
@@ -107,13 +156,46 @@ const VolunteerForm = () => {
       payload.tshirtSize = formData.tShirtSize;
       delete payload.tShirtSize;
 
-      await axios.post('https://vrc-server-110406681774.asia-south1.run.app/volunteerform/api/volunteers', payload);
+      const formDataToSend = new FormData();
+      
+      Object.entries(payload).forEach(([key, value]) => {
+        if (Array.isArray(value)) {
+          formDataToSend.append(key, JSON.stringify(value));
+        } else {
+          formDataToSend.append(key, value);
+        }
+      });
+   
+      if (imageFile) {
+        formDataToSend.append('image', imageFile);
+      }
+
+      await axios.post(
+        // 'https://vrc-server-110406681774.asia-south1.run.app/volunteerform/api/volunteers',
+        "http://localhost:3300/volunteerform/api/volunteers",
+        formDataToSend,
+        { headers: { 'Content-Type': 'multipart/form-data' } }
+      );
+
       toast({ title: 'Success', description: 'Volunteer registered.', status: 'success', duration: 3000 });
       setFormData({
-        name: '', whatsappNumber: '', dateOfBirth: '', age: '', gender: '', maritalStatus: '', profession: '',
-        collegeOrCompany: '', location: '', contactPerson: '', infoSource: '', serviceAvailability: [],
-        tShirtSize: '', needAccommodation: ''
+        name: '',
+        whatsappNumber: '',
+        dateOfBirth: '',
+        age: '',
+        gender: '',
+        maritalStatus: '',
+        profession: '',
+        collegeOrCompany: '',
+        location: '',
+        contactPerson: '',
+        infoSource: '',
+        serviceAvailability: [],
+        tShirtSize: '',
+        needAccommodation: ''
       });
+      setImage(null);
+      setImageFile(null);
     } catch (err) {
       toast({
         title: 'Error',
@@ -122,20 +204,38 @@ const VolunteerForm = () => {
         duration: 3000
       });
     }
+    setLoading(false); 
   };
 
   return (
     <Box
       p={6}
-      maxW="600px"
+      maxW="750px"
       mx="auto"
-   
       bgSize="cover"
       bgPosition="center"
       bgRepeat="no-repeat"
       borderRadius="xl"
       boxShadow="xl"
+      position="relative"
+      minHeight="600px"
     >
+      {loading && (
+        <Center
+          position="absolute"
+          top={0}
+          left={0}
+          right={0}
+          bottom={0}
+          bg="rgba(255,255,255,0.7)"
+          zIndex={99}
+          borderRadius="xl"
+          flexDirection="column"
+        >
+          <Spinner size="xl" color="teal.400" thickness="5px" />
+          <Text mt={4} fontWeight="bold" color="teal.700">Submitting...</Text>
+        </Center>
+      )}
       <VStack spacing={4} align="stretch" bg="whiteAlpha.900" p={6} borderRadius="xl">
         <Heading size="lg" color="teal.600">Sri Krishna Janmashtami Volunteer Registration</Heading>
 
@@ -220,21 +320,64 @@ const VolunteerForm = () => {
           </Select>
         </FormControl>
 
-        {["August 14", "August 15", "August 16", "August 17"].map((date) => (
-          <FormControl key={date}>
-            <FormLabel>Service Availability for {date}</FormLabel>
+        {dates.map((date, idx) => (
+          <Box
+            key={date}
+            bg={idx % 2 === 1 ? "gray.50" : "white"}
+            borderRadius="md"
+            p={4}
+            mb={3}
+          >
+            <Text fontWeight="semibold" mb={2} fontSize="lg">{date}</Text>
             <RadioGroup
               onChange={(val) => handleServiceChange(date, val)}
               value={formData.serviceAvailability.find((d) => d.date === date)?.timeSlot || ''}
             >
-              <Stack direction="column">
-                <Radio value="Full Day">9am to 9pm (Full Day)</Radio>
-                <Radio value="Half Day 2pm">2pm to 9pm (Half Day)</Radio>
-                <Radio value="Half Day 4pm">4pm to 9pm (Half Day)</Radio>
-                <Radio value="Not Possible">Not Possible</Radio>
-              </Stack>
+              <SimpleGrid columns={{ base: 1, sm: 2, md: 4 }} spacing={4}>
+                {timeSlots.map(slot => (
+                  <Box
+                    as="label"
+                    key={slot.value}
+                    htmlFor={`${date}-${slot.value}`}
+                  >
+                    <Radio
+                      value={slot.value}
+                      id={`${date}-${slot.value}`}
+                      display="none"
+                    />
+                    <Box
+                      border="1px solid"
+                      borderColor="gray.300"
+                      borderRadius="md"
+                      p={3}
+                      textAlign="center"
+                      fontWeight="medium"
+                      cursor="pointer"
+                      background={
+                        formData.serviceAvailability.find((d) => d.date === date)?.timeSlot === slot.value
+                          ? "gray.200"
+                          : "white"
+                      }
+                      transition="background 0.2s"
+                      _hover={{
+                        borderColor: "teal.400"
+                      }}
+                      sx={{
+                        ...(formData.serviceAvailability.find((d) => d.date === date)?.timeSlot === slot.value
+                          ? {
+                              boxShadow: "0 0 0 2px #319795",
+                              borderColor: "teal.500"
+                            }
+                          : {})
+                      }}
+                    >
+                      {slot.label}
+                    </Box>
+                  </Box>
+                ))}
+              </SimpleGrid>
             </RadioGroup>
-          </FormControl>
+          </Box>
         ))}
 
         {isYoungBoy && isFullDayVolunteer && (
@@ -262,7 +405,31 @@ const VolunteerForm = () => {
           </>
         )}
 
-        <Button colorScheme="teal" size="lg" onClick={handleSubmit}>Submit</Button>
+        <Box mt={5}>
+          <Heading size="md" color="teal.500" mb={2}>Capture Your Photo (Required)</Heading>
+          {!image ? (
+            <>
+              <Webcam
+                audio={false}
+                ref={webcamRef}
+                screenshotFormat="image/png"
+                width={320}
+                videoConstraints={{ facingMode: "user" }}
+                style={{ borderRadius: 8, marginBottom: 12 }}
+              />
+              <Button mt={2} onClick={capture} colorScheme="teal">Capture Photo</Button>
+            </>
+          ) : (
+            <Box>
+              <img src={image} alt="Captured" style={{ width: 180, borderRadius: 8 }} />
+              <Button mt={2} onClick={handleRetake}>Retake</Button>
+            </Box>
+          )}
+        </Box>
+
+        <Button colorScheme="teal" size="lg" onClick={handleSubmit} isLoading={loading} loadingText="Submitting">
+          Submit
+        </Button>
       </VStack>
     </Box>
   );
