@@ -15,11 +15,12 @@ import {
   FormLabel,
   SimpleGrid,
   Spinner,
+  Image,
   Center,
 } from '@chakra-ui/react';
 import axios from 'axios';
 import Webcam from 'react-webcam';
-
+import banner from "../assets/banner.jpeg"
 const devotees = [
   { name: 'Sitanatha Dasa', img: 'https://www.harekrishnavizag.org/assets/img/about_1.jpg' },
   { name: 'Rama Dasa', img: 'https://www.harekrishnavizag.org/assets/img/about_1.jpg' },
@@ -236,6 +237,7 @@ const VolunteerForm = () => {
           <Text mt={4} fontWeight="bold" color="teal.700">Submitting...</Text>
         </Center>
       )}
+        <Image src={banner} width={"100%"} />
       <VStack spacing={4} align="stretch" bg="whiteAlpha.900" p={6} borderRadius="xl">
         <Heading size="lg" color="teal.600">Sri Krishna Janmashtami Volunteer Registration</Heading>
 
@@ -409,14 +411,18 @@ const VolunteerForm = () => {
           <Heading size="md" color="teal.500" mb={2}>Capture Your Photo (Required)</Heading>
           {!image ? (
             <>
-              <Webcam
-                audio={false}
-                ref={webcamRef}
-                screenshotFormat="image/png"
-                width={320}
-                videoConstraints={{ facingMode: "user" }}
-                style={{ borderRadius: 8, marginBottom: 12 }}
-              />
+             <Webcam
+  audio={false}
+  ref={webcamRef}
+  screenshotFormat="image/png"
+  width={320}
+  videoConstraints={{ facingMode: "user" }}
+  style={{ borderRadius: 8, marginBottom: 12 }}
+  onUserMediaError={err => {
+    console.error("Camera error", err);
+    alert("Camera error: " + err.name);
+  }}
+/>
               <Button mt={2} onClick={capture} colorScheme="teal">Capture Photo</Button>
             </>
           ) : (
