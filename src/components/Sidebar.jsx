@@ -21,7 +21,7 @@ const SidebarContent = ({ onClose }) => (
       { label: "All Volunteers", path: "/" },
       { label: "Assign-Service", path: "/service" },
       { label: "Send-MeetUp Message", path: "/meetup" },
-      {label:'service-Coordinatar'},
+      {label:'service-Coordinatar',path:"/servicecoordinatorform"},
       { label: "Volunteer-Manager", path: "/Registeration" },
       { label: "Managers", path: "/manager" },
       { label: "Services", path: "/service-list" },
