@@ -10,6 +10,7 @@ import {
   Heading,
 } from '@chakra-ui/react';
 import axios from 'axios';
+import Layout from '../components/Layout';
 
 const ServiceCoordinatorForm = () => {
   const [serviceName, setServiceName] = useState('');
@@ -47,6 +48,7 @@ const ServiceCoordinatorForm = () => {
   };
 
   return (
+    <Layout>
     <Box maxW="400px" mx="auto" mt={12} p={6} borderRadius="xl" boxShadow="xl" bg="white">
       <VStack spacing={5} align="stretch">
         <Heading size="md" color="teal.600">Add Service & Coordinator</Heading>
@@ -67,6 +69,7 @@ const ServiceCoordinatorForm = () => {
         </Button>
       </VStack>
     </Box>
+    </Layout>
   );
 };
 

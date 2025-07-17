@@ -12,6 +12,7 @@ import { useParams } from "react-router-dom";
 import { MdLocationOn, MdDateRange } from "react-icons/md";
 import axios from "axios";
 import dayjs from "dayjs";
+import Layout from "../components/Layout";
 
 const ProjectDetails = () => {
   const { id } = useParams(); // get project ID from route
@@ -53,6 +54,7 @@ const ProjectDetails = () => {
   }
 
   return (
+    <Layout>
     <Box maxW="lg" mx="auto" mt={10} p={6} borderWidth={1} borderRadius="lg">
       <Heading mb={4}>{project.name}</Heading>
 
@@ -74,6 +76,7 @@ const ProjectDetails = () => {
         )}
       </Stack>
     </Box>
+    </Layout>
   );
 };
 
