@@ -29,7 +29,6 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import axios from 'axios';
-import Layout from '../components/Layout';
 
 const VolunteerTableWithModal = () => {
   const [volunteers, setVolunteers] = useState([]);
@@ -40,7 +39,6 @@ const VolunteerTableWithModal = () => {
   const [serviceCoordinators, setServiceCoordinators] = useState([]);
   const [assigning, setAssigning] = useState({});
   const toast = useToast();
-
 
   const [serviceSelection, setServiceSelection] = useState({});
 
@@ -54,7 +52,6 @@ const VolunteerTableWithModal = () => {
       })
       .catch((err) => console.error(err));
   }, []);
-
 
   useEffect(() => {
     axios
@@ -82,43 +79,31 @@ const VolunteerTableWithModal = () => {
     onOpen();
   };
 
-  const handleServiceChange = (volId, value) => {
+  const handleServiceChange = async (volId, value) => {
     setServiceSelection((prev) => ({
       ...prev,
       [volId]: value,
     }));
-  };
 
-  const handleAssignService = async (volunteerId) => {
-    const serviceId = serviceSelection[volunteerId];
-    if (!serviceId) {
-      toast({
-        title: "Error",
-        description: "Select a service before updating.",
-        status: "error",
-        duration: 2500,
-      });
-      return;
-    }
-    setAssigning((prev) => ({ ...prev, [volunteerId]: true }));
+    setAssigning((prev) => ({ ...prev, [volId]: true }));
+
     try {
       await axios.patch(
-        `https://vrc-server-110406681774.asia-south1.run.app/volunteerform/api/volunteers/${volunteerId}`,
-        { assignedService: serviceId }
+        `https://vrc-server-110406681774.asia-south1.run.app/volunteerform/api/volunteers/${volId}`,
+        { assignedService: value }
       );
-
 
       setVolunteers((prev) =>
         prev.map((v) =>
-          v._id === volunteerId
-            ? { ...v, assignedService: serviceId }
+          v._id === volId
+            ? { ...v, assignedService: value }
             : v
         )
       );
       setFilteredVolunteers((prev) =>
         prev.map((v) =>
-          v._id === volunteerId
-            ? { ...v, assignedService: serviceId }
+          v._id === volId
+            ? { ...v, assignedService: value }
             : v
         )
       );
@@ -137,9 +122,8 @@ const VolunteerTableWithModal = () => {
         duration: 3000,
       });
     }
-    setAssigning((prev) => ({ ...prev, [volunteerId]: false }));
+    setAssigning((prev) => ({ ...prev, [volId]: false }));
   };
-
 
   const getServiceName = (serviceId) => {
     const found = serviceCoordinators.find((s) => s._id === serviceId);
@@ -147,7 +131,6 @@ const VolunteerTableWithModal = () => {
   };
 
   return (
-    <Layout>
     <Box p={6} overflowX="auto">
       <HStack spacing={4} mb={4} flexWrap="wrap">
         <Input
@@ -214,10 +197,11 @@ const VolunteerTableWithModal = () => {
                     placeholder="Assign Service"
                     size="sm"
                     maxW="140px"
-                    value={serviceSelection[volunteer._id] || ''}
+                    value={serviceSelection[volunteer._id] || volunteer.assignedService || ''}
                     onChange={(e) =>
                       handleServiceChange(volunteer._id, e.target.value)
                     }
+                    isDisabled={assigning[volunteer._id]}
                   >
                     {serviceCoordinators.map((svc) => (
                       <option key={svc._id} value={svc._id}>
@@ -225,14 +209,7 @@ const VolunteerTableWithModal = () => {
                       </option>
                     ))}
                   </Select>
-                  <Button
-                    colorScheme="teal"
-                    size="sm"
-                    onClick={() => handleAssignService(volunteer._id)}
-                    isLoading={assigning[volunteer._id]}
-                  >
-                    Update
-                  </Button>
+                  {assigning[volunteer._id] && <Spinner size="sm" />}
                 </HStack>
               </Td>
             </Tr>
@@ -272,7 +249,6 @@ const VolunteerTableWithModal = () => {
               <Box>
                 <Text><strong>Assigned Service:</strong></Text>
                 {(() => {
-                 
                   const svc = serviceCoordinators.find(
                     (s) => s._id === selectedVolunteer.assignedService
                   );
@@ -308,7 +284,6 @@ const VolunteerTableWithModal = () => {
       </Modal>
       )}
     </Box>
-    </Layout>
   );
 };
 
