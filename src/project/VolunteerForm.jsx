@@ -80,6 +80,10 @@ const VolunteerForm = () => {
 
   const isYoungBoy = Number(formData.age) > 0 && Number(formData.age) < 30 && formData.gender === 'Male';
   const isFullDayVolunteer = formData.serviceAvailability.some((entry) => entry.timeSlot === 'Full Day');
+  // Show t-shirt selection for ALL full day volunteers (male or female)
+  const showTshirtSelection = isFullDayVolunteer;
+  // Accommodation logic: only for young boys who are full day volunteers
+  const showAccommodationSelection = isYoungBoy && isFullDayVolunteer;
 
   const handleChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -115,14 +119,13 @@ const VolunteerForm = () => {
     if (!formData.age || Number(formData.age) <= 0) return 'Valid Age is required';
     if (!formData.gender) return 'Gender is required';
     if (!formData.contactPerson) return 'Contact person is required';
-    if (isYoungBoy && !formData.profession) return 'Profession is required';
-    if (isYoungBoy && !formData.maritalStatus) return 'Marital Status is required';
-    if (isYoungBoy && !formData.collegeOrCompany.trim()) return 'College or Company name is required';
-    if (isFullDayVolunteer && !formData.tShirtSize) return 'T-Shirt Size is required';
-    // if (isYoungBoy && isFullDayVolunteer && (!formData.needAccommodation || (formData.needAccommodation !== 'Yes' && formData.needAccommodation !== 'No'))) {
-    //   return 'Accommodation info is required and must be Yes or No';
-    // }
-
+    if (!formData.profession) return 'Profession is required';
+    if (!formData.maritalStatus) return 'Marital Status is required';
+    if (!formData.collegeOrCompany.trim()) return 'College or Company name is required';
+    if (showTshirtSelection && !formData.tShirtSize) return 'T-Shirt Size is required';
+    if (showAccommodationSelection && (!formData.needAccommodation || (formData.needAccommodation !== 'Yes' && formData.needAccommodation !== 'No'))) {
+      return 'Accommodation info is required and must be Yes or No';
+    }
     if (!imageFile) return 'Photo is required. Please capture your photo below.';
     return null;
   };
@@ -138,16 +141,14 @@ const VolunteerForm = () => {
     try {
       const payload = { ...formData };
 
-      if (!isYoungBoy) {
-        delete payload.profession;
-        delete payload.maritalStatus;
-        delete payload.collegeOrCompany;
-      }
-      if (!isFullDayVolunteer) {
+      // Only remove tShirtSize if not shown for current volunteer
+      if (!showTshirtSelection) {
         delete payload.tShirtSize;
+      }
+      // Only remove needAccommodation if not shown for current volunteer
+      if (!showAccommodationSelection) {
         delete payload.needAccommodation;
       }
-      if (!payload.profession && isYoungBoy) payload.profession = 'Student';
       if (!payload.infoSource) payload.infoSource = 'Other';
       payload.referredBy = formData.contactPerson || 'Other';
       delete payload.contactPerson;
@@ -158,13 +159,12 @@ const VolunteerForm = () => {
       payload.tshirtSize = formData.tShirtSize;
       delete payload.tShirtSize;
 
-      
+      // Prevent sending empty string or invalid value for needAccommodation
       if (payload.needAccommodation !== "Yes" && payload.needAccommodation !== "No") {
         delete payload.needAccommodation;
       }
 
       const formDataToSend = new FormData();
-      
       Object.entries(payload).forEach(([key, value]) => {
         if (Array.isArray(value)) {
           formDataToSend.append(key, JSON.stringify(value));
@@ -274,33 +274,35 @@ const VolunteerForm = () => {
           </Select>
         </FormControl>
 
-        {isYoungBoy && (
-          <>
-            <FormControl>
-              <FormLabel>Marital Status</FormLabel>
-              <Select placeholder="Select" value={formData.maritalStatus} onChange={(e) => handleChange('maritalStatus', e.target.value)}>
-                <option>Single</option>
-                <option>Married</option>
-              </Select>
-            </FormControl>
+        <FormControl isRequired>
+          <FormLabel>Marital Status</FormLabel>
+          <Select placeholder="Select" value={formData.maritalStatus} onChange={(e) => handleChange('maritalStatus', e.target.value)}>
+            <option>Single</option>
+            <option>Married</option>
+          </Select>
+        </FormControl>
 
-            <FormControl>
-              <FormLabel>Profession</FormLabel>
-              <Select value={formData.profession} onChange={(e) => handleChange('profession', e.target.value)}>
-                <option>Student</option>
-                <option>Working</option>
-                <option>Job Trails</option>
-                <option>Business</option>
-                <option>Others</option>
-              </Select>
-            </FormControl>
+        
 
-            <FormControl>
-              <FormLabel>College / Company Name</FormLabel>
-              <Input value={formData.collegeOrCompany} onChange={(e) => handleChange('collegeOrCompany', e.target.value)} />
-            </FormControl>
-          </>
-        )}
+<FormControl isRequired>
+  <FormLabel>Profession</FormLabel>
+  <Select
+    placeholder="Please select the Profession*"
+    value={formData.profession}
+    onChange={(e) => handleChange('profession', e.target.value)}
+  >
+    <option value="Student">Student</option>
+    <option value="Working">Working</option>
+    <option value="Job Trails">Job Trails</option>
+    <option value="Business">Business</option>
+    <option value="Others">Others</option>
+  </Select>
+</FormControl>
+
+        <FormControl isRequired>
+          <FormLabel>College / Company Name</FormLabel>
+          <Input value={formData.collegeOrCompany} onChange={(e) => handleChange('collegeOrCompany', e.target.value)} />
+        </FormControl>
 
         <FormControl>
           <FormLabel>Your Current Locality</FormLabel>
@@ -387,29 +389,29 @@ const VolunteerForm = () => {
           </Box>
         ))}
 
-        {isYoungBoy && isFullDayVolunteer && (
-          <>
-            <FormControl>
-              <FormLabel>T Shirt Size (for Full Day Volunteers)</FormLabel>
-              <Select placeholder="Select size" value={formData.tShirtSize} onChange={(e) => handleChange('tShirtSize', e.target.value)}>
-                <option value="XL">XL</option>
-                <option value="L">L</option>
-                <option value="M">M</option>
-                <option value="S">S</option>
-              </Select>
-            </FormControl>
+        {showTshirtSelection && (
+          <FormControl isRequired>
+            <FormLabel>T Shirt Size (for Full Day Volunteers)</FormLabel>
+            <Select placeholder="Select size" value={formData.tShirtSize} onChange={(e) => handleChange('tShirtSize', e.target.value)}>
+              <option value="XL">XL</option>
+              <option value="L">L</option>
+              <option value="M">M</option>
+              <option value="S">S</option>
+            </Select>
+          </FormControl>
+        )}
 
-            <FormControl isRequired>
-              <FormLabel>Need Accommodation?</FormLabel>
-              <RadioGroup value={formData.needAccommodation} onChange={(val) => handleChange('needAccommodation', val)}>
-                <Stack direction="row">
-                  <Radio value="Yes">Yes</Radio>
-                  <Radio value="No">No</Radio>
-                </Stack>
-              </RadioGroup>
-              <Text fontSize="sm" color="gray.500">Please confirm with Sitanatha Dasa - 9059162108</Text>
-            </FormControl>
-          </>
+        {showAccommodationSelection && (
+          <FormControl isRequired>
+            <FormLabel>Need Accommodation?</FormLabel>
+            <RadioGroup value={formData.needAccommodation} onChange={(val) => handleChange('needAccommodation', val)}>
+              <Stack direction="row">
+                <Radio value="Yes">Yes</Radio>
+                <Radio value="No">No</Radio>
+              </Stack>
+            </RadioGroup>
+            <Text fontSize="sm" color="gray.500">Please confirm with Sitanatha Dasa - 9059162108</Text>
+          </FormControl>
         )}
 
         <Box mt={5}>
