@@ -50,7 +50,7 @@ const timeSlots = [
   { label: "9am to 9pm (Full Day)", value: "Full Day" },
   { label: "2pm to 9pm (Half Day)", value: "Half Day 2pm" },
   { label: "4pm to 9pm(Half Day)", value: "Half Day 4pm" },
-  { label: "Not Possible this day", value: "Not Possible " }
+  { label: "Not Possible this day", value: "Not Possible" }
 ];
 
 const VolunteerForm = () => {
@@ -179,6 +179,7 @@ const VolunteerForm = () => {
 
       await axios.post(
         "https://vrc-server-110406681774.asia-south1.run.app/volunteerform/api/volunteers",
+        // "http://localhost:3300/volunteerform/api/volunteers",
         formDataToSend,
         { headers: { 'Content-Type': 'multipart/form-data' } }
       );
