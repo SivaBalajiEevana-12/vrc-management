@@ -80,9 +80,9 @@ const VolunteerForm = () => {
 
   const isYoungBoy = Number(formData.age) > 0 && Number(formData.age) < 30 && formData.gender === 'Male';
   const isFullDayVolunteer = formData.serviceAvailability.some((entry) => entry.timeSlot === 'Full Day');
-  // Show t-shirt selection for ALL full day volunteers (male or female)
+  
   const showTshirtSelection = isFullDayVolunteer;
-  // Accommodation logic: only for young boys who are full day volunteers
+  
   const showAccommodationSelection = isYoungBoy && isFullDayVolunteer;
 
   const handleChange = (field, value) => {
@@ -141,11 +141,11 @@ const VolunteerForm = () => {
     try {
       const payload = { ...formData };
 
-      // Only remove tShirtSize if not shown for current volunteer
+     
       if (!showTshirtSelection) {
         delete payload.tShirtSize;
       }
-      // Only remove needAccommodation if not shown for current volunteer
+      
       if (!showAccommodationSelection) {
         delete payload.needAccommodation;
       }
@@ -159,7 +159,7 @@ const VolunteerForm = () => {
       payload.tshirtSize = formData.tShirtSize;
       delete payload.tShirtSize;
 
-      // Prevent sending empty string or invalid value for needAccommodation
+    
       if (payload.needAccommodation !== "Yes" && payload.needAccommodation !== "No") {
         delete payload.needAccommodation;
       }
