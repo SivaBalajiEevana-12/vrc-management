@@ -410,7 +410,7 @@ const VolunteerForm = () => {
                 <Radio value="No">No</Radio>
               </Stack>
             </RadioGroup>
-            <Text fontSize="sm" color="gray.500">Please confirm with Sitanatha Dasa - 9059162108</Text>
+            {/* <Text fontSize="sm" color="gray.500">Please confirm with Sitanatha Dasa - 9059162108</Text> */}
           </FormControl>
         )}
 
