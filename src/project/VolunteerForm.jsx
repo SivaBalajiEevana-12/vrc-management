@@ -119,9 +119,9 @@ const VolunteerForm = () => {
     if (isYoungBoy && !formData.maritalStatus) return 'Marital Status is required';
     if (isYoungBoy && !formData.collegeOrCompany.trim()) return 'College or Company name is required';
     if (isFullDayVolunteer && !formData.tShirtSize) return 'T-Shirt Size is required';
-    if (isYoungBoy && isFullDayVolunteer && (!formData.needAccommodation || (formData.needAccommodation !== 'Yes' && formData.needAccommodation !== 'No'))) {
-      return 'Accommodation info is required and must be Yes or No';
-    }
+    // if (isYoungBoy && isFullDayVolunteer && (!formData.needAccommodation || (formData.needAccommodation !== 'Yes' && formData.needAccommodation !== 'No'))) {
+    //   return 'Accommodation info is required and must be Yes or No';
+    // }
 
     if (!imageFile) return 'Photo is required. Please capture your photo below.';
     return null;
