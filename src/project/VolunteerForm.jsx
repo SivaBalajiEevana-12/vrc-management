@@ -123,9 +123,9 @@ const VolunteerForm = () => {
     if (!formData.maritalStatus) return 'Marital Status is required';
     if (!formData.collegeOrCompany.trim()) return 'College or Company name is required';
     if (showTshirtSelection && !formData.tShirtSize) return 'T-Shirt Size is required';
-    if (showAccommodationSelection && (!formData.needAccommodation || (formData.needAccommodation !== 'Yes' && formData.needAccommodation !== 'No'))) {
-      return 'Accommodation info is required and must be Yes or No';
-    }
+    // if (showAccommodationSelection && (!formData.needAccommodation || (formData.needAccommodation !== 'Yes' && formData.needAccommodation !== 'No'))) {
+    //   return 'Accommodation info is required and must be Yes or No';
+    // }
     if (!imageFile) return 'Photo is required. Please capture your photo below.';
     return null;
   };
