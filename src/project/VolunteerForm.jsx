@@ -20,7 +20,8 @@ import {
 } from '@chakra-ui/react';
 import axios from 'axios';
 import Webcam from 'react-webcam';
-import banner from "../assets/banner.jpeg"
+import banner from "../assets/banner.jpeg";
+
 const devotees = [
   { name: 'Sitanatha Dasa', img: 'https://www.harekrishnavizag.org/assets/img/about_1.jpg' },
   { name: 'Rama Dasa', img: 'https://www.harekrishnavizag.org/assets/img/about_1.jpg' },
@@ -43,7 +44,6 @@ const devotees = [
   { name: 'Ishan Krishna Dasa', img: 'https://www.harekrishnavizag.org/assets/img/about_1.jpg' },
   { name: 'Others', img: 'https://www.harekrishnavizag.org/assets/img/about_1.jpg' },
 ];
-
 
 const dates = ["August 14", "August 15", "August 16", "August 17"];
 const timeSlots = [
@@ -91,7 +91,6 @@ const VolunteerForm = () => {
     setFormData((prev) => ({ ...prev, serviceAvailability: updated }));
   };
 
-
   const capture = React.useCallback(() => {
     const imageSrc = webcamRef.current.getScreenshot();
     setImage(imageSrc);
@@ -120,7 +119,9 @@ const VolunteerForm = () => {
     if (isYoungBoy && !formData.maritalStatus) return 'Marital Status is required';
     if (isYoungBoy && !formData.collegeOrCompany.trim()) return 'College or Company name is required';
     if (isFullDayVolunteer && !formData.tShirtSize) return 'T-Shirt Size is required';
-    if (isFullDayVolunteer && !formData.needAccommodation) return 'Accommodation info is required';
+    if (isYoungBoy && isFullDayVolunteer && (!formData.needAccommodation || (formData.needAccommodation !== 'Yes' && formData.needAccommodation !== 'No'))) {
+      return 'Accommodation info is required and must be Yes or No';
+    }
 
     if (!imageFile) return 'Photo is required. Please capture your photo below.';
     return null;
@@ -157,6 +158,11 @@ const VolunteerForm = () => {
       payload.tshirtSize = formData.tShirtSize;
       delete payload.tShirtSize;
 
+      
+      if (payload.needAccommodation !== "Yes" && payload.needAccommodation !== "No") {
+        delete payload.needAccommodation;
+      }
+
       const formDataToSend = new FormData();
       
       Object.entries(payload).forEach(([key, value]) => {
@@ -172,7 +178,6 @@ const VolunteerForm = () => {
       }
 
       await axios.post(
-        // 'https://vrc-server-110406681774.asia-south1.run.app/volunteerform/api/volunteers',
         "https://vrc-server-110406681774.asia-south1.run.app/volunteerform/api/volunteers",
         formDataToSend,
         { headers: { 'Content-Type': 'multipart/form-data' } }
@@ -237,7 +242,7 @@ const VolunteerForm = () => {
           <Text mt={4} fontWeight="bold" color="teal.700">Submitting...</Text>
         </Center>
       )}
-        <Image src={banner} width={"100%"} />
+      <Image src={banner} width={"100%"} />
       <VStack spacing={4} align="stretch" bg="whiteAlpha.900" p={6} borderRadius="xl">
         <Heading size="lg" color="teal.600">Sri Krishna Janmashtami Volunteer Registration</Heading>
 
@@ -394,7 +399,7 @@ const VolunteerForm = () => {
               </Select>
             </FormControl>
 
-            <FormControl>
+            <FormControl isRequired>
               <FormLabel>Need Accommodation?</FormLabel>
               <RadioGroup value={formData.needAccommodation} onChange={(val) => handleChange('needAccommodation', val)}>
                 <Stack direction="row">
@@ -411,18 +416,18 @@ const VolunteerForm = () => {
           <Heading size="md" color="teal.500" mb={2}>Capture Your Photo (Required)</Heading>
           {!image ? (
             <>
-             <Webcam
-  audio={false}
-  ref={webcamRef}
-  screenshotFormat="image/png"
-  width={320}
-  videoConstraints={{ facingMode: "user" }}
-  style={{ borderRadius: 8, marginBottom: 12 }}
-  onUserMediaError={err => {
-    console.error("Camera error", err);
-    alert("Camera error: " + err.name);
-  }}
-/>
+              <Webcam
+                audio={false}
+                ref={webcamRef}
+                screenshotFormat="image/png"
+                width={320}
+                videoConstraints={{ facingMode: "user" }}
+                style={{ borderRadius: 8, marginBottom: 12 }}
+                onUserMediaError={err => {
+                  console.error("Camera error", err);
+                  alert("Camera error: " + err.name);
+                }}
+              />
               <Button mt={2} onClick={capture} colorScheme="teal">Capture Photo</Button>
             </>
           ) : (
