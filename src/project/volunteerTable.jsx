@@ -239,7 +239,7 @@ const VolunteerTableWithModal = () => {
               <Text><strong>Referred By:</strong> {selectedVolunteer.referredBy}</Text>
               <Text><strong>Info Source:</strong> {selectedVolunteer.infoSource}</Text>
               <Text><strong>T-Shirt Size:</strong> {selectedVolunteer.tshirtSize || '-'}</Text>
-              <Text><strong>Accommodation:</strong> {selectedVolunteer.needAccommodation || '-'}</Text>
+              <Text><strong>Accommodation:</strong> {selectedVolunteer.needAccommodation? "Yes" : " NO"}</Text>
               <Box>
                 <Text><strong>Service Availability:</strong></Text>
                 {selectedVolunteer.serviceAvailability.map((slot) => (
