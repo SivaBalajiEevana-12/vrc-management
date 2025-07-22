@@ -51,7 +51,7 @@ const VolunteerTableWithModal = () => {
   useEffect(() => {
     fetchVolunteers();
   }, []);
-//https://vrc-server-110406681774.asia-south1.run.app/volunteerform/api/volunteers
+  //https://vrc-server-110406681774.asia-south1.run.app/volunteerform/api/volunteers
   const fetchVolunteers = async () => {
     try {
       const res = await axios.get('https://vrc-server-110406681774.asia-south1.run.app/volunteerform/api/volunteers');
@@ -136,12 +136,10 @@ const VolunteerTableWithModal = () => {
   };
 
   const handleDeleteVolunteer = async (volId) => {
-    console.log(volId)
     setDeleting(true);
     try {
       await axios.delete(
         `https://vrc-server-110406681774.asia-south1.run.app/volunteerform/api/volunteers/${volId}`
-        // `http://localhost:3300/volunteerform/${volId}`
       );
       toast({
         title: "Deleted",
@@ -211,19 +209,21 @@ const VolunteerTableWithModal = () => {
         <Table variant="simple" size="md">
           <Thead bg="teal.500">
             <Tr>
+              <Th color="white">S.No</Th>
               <Th color="white">Image</Th>
               <Th color="white">Name</Th>
               <Th color="white">WhatsApp</Th>
               <Th color="white">Gender</Th>
               <Th color="white">Age</Th>
-              <Th color="white">T-Shirt Size</Th>
-              <Th color="white">Assigned Service</Th>
+              <Th color="white">Service Availability</Th>
+              {/* <Th color="white">Assigned Service</Th> */}
               <Th color="white">Assign</Th>
             </Tr>
           </Thead>
           <Tbody>
-            {filteredVolunteers.map((volunteer) => (
+            {filteredVolunteers.map((volunteer, idx) => (
               <Tr key={volunteer._id} _hover={{ bg: 'gray.100', cursor: 'pointer' }}>
+                <Td>{idx + 1}</Td>
                 <Td>
                   {volunteer.imageUrl ? (
                     <Avatar size="xl" name={volunteer.name} src={volunteer.imageUrl} />
@@ -235,12 +235,24 @@ const VolunteerTableWithModal = () => {
                 <Td onClick={() => handleRowClick(volunteer)}>{volunteer.whatsappNumber}</Td>
                 <Td onClick={() => handleRowClick(volunteer)}>{volunteer.gender}</Td>
                 <Td onClick={() => handleRowClick(volunteer)}>{volunteer.age}</Td>
-                <Td onClick={() => handleRowClick(volunteer)}>{volunteer.tshirtSize || '-'}</Td>
                 <Td>
+                  {volunteer.serviceAvailability && volunteer.serviceAvailability.length > 0 ? (
+                    <VStack align="start" spacing={1}>
+                      {volunteer.serviceAvailability.map((slot) => (
+                        <Badge key={slot._id || slot.date + slot.timeSlot} colorScheme="teal" mr={1} mb={1}>
+                          {slot.date} - {slot.timeSlot}
+                        </Badge>
+                      ))}
+                    </VStack>
+                  ) : (
+                    <Badge colorScheme="gray">-</Badge>
+                  )}
+                </Td>
+                {/* <Td>
                   {getServiceName(volunteer.assignedService) || (
                     <Badge colorScheme="gray">Unassigned</Badge>
                   )}
-                </Td>
+                </Td> */}
                 <Td>
                   <HStack>
                     <Select
@@ -286,7 +298,6 @@ const VolunteerTableWithModal = () => {
                   <Text><strong>Locality:</strong> {selectedVolunteer.locality || '-'}</Text>
                   <Text><strong>Referred By:</strong> {selectedVolunteer.referredBy}</Text>
                   <Text><strong>Info Source:</strong> {selectedVolunteer.infoSource}</Text>
-                  <Text><strong>T-Shirt Size:</strong> {selectedVolunteer.tshirtSize || '-'}</Text>
                   <Text><strong>Accommodation:</strong> {selectedVolunteer.needAccommodation ? "Yes" : "NO"}</Text>
                   <Box>
                     <Text><strong>Service Availability:</strong></Text>
