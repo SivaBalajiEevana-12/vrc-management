@@ -139,6 +139,7 @@ const VolunteerTableWithModal = () => {
     setDeleting(true);
     try {
       await axios.delete(
+        // `https://vrc-server-110406681774.asia-south1.run.app/volunteerform/api/volunteers/${volId}`
         `https://vrc-server-110406681774.asia-south1.run.app/volunteerform/api/volunteers/${volId}`
       );
       toast({
@@ -169,9 +170,9 @@ const VolunteerTableWithModal = () => {
 
   return (
     <Layout>
-      <Box p={6} overflowX="auto">
+      <Box p={6} overflowX="auto" >
         {/* Volunteer count at top */}
-        <Flex align="center" justify="space-between" mb={4}>
+        <Flex align="center" justify="space-between"mt={["40px",null,null,null]} mb={4}>
           <Alert status="info" borderRadius="md" maxW="380px">
             <AlertIcon />
             <AlertTitle>
