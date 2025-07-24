@@ -139,8 +139,8 @@ const VolunteerTableWithModal = () => {
     setDeleting(true);
     try {
       await axios.delete(
-        // `https://vrc-server-110406681774.asia-south1.run.app/volunteerform/api/volunteers/${volId}`
         `https://vrc-server-110406681774.asia-south1.run.app/volunteerform/api/volunteers/${volId}`
+        // `http://localhost:3300/volunteerform/api/volunteers/${volId}`
       );
       toast({
         title: "Deleted",
