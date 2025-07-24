@@ -34,7 +34,7 @@ const Login = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const res = await fetch("http://localhost:3300/user/login", {
+      const res = await fetch("https://vrc-server-110406681774.asia-south1.run.app/user/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
