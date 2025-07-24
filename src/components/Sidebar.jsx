@@ -8,10 +8,20 @@ import {
   DrawerOverlay,
   DrawerContent,
   DrawerBody,
+  Button,
 } from "@chakra-ui/react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
+
+
+const handleLogout = () => {
+  localStorage.clear("token");
+  <Navigate to={"/api/admin/login"}/>
+  window.location.reload()
+}
 
 const SidebarContent = ({ onClose }) => (
+  
+
   <VStack align="stretch" spacing="2" p="3">
     <Text fontSize="2xl" fontWeight="bold" mb="6" textAlign="center">
       Vcc-Volunteer
@@ -30,6 +40,7 @@ const SidebarContent = ({ onClose }) => (
       { label: "Bahuda Ratha Yatra-Attendance", path: "/july/user/attendece" },
       {label:"Flc-2 Attendance",path:"/july/flc/attendece"}
 
+
      
 
     ].map(({ label, path }) => (
@@ -45,6 +56,7 @@ const SidebarContent = ({ onClose }) => (
         {label}
       </Box>
     ))}
+    <Button color={"red"} mt={2} onClick={handleLogout}>LogOut</Button>
   </VStack>
 );
 

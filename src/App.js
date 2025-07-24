@@ -33,10 +33,12 @@ import UserTable from './UsersTable';
 import VolunteerTableWithModal from './project/volunteerTable';
 import VolunteerForm from './project/VolunteerForm';
 import ServiceCoordinatorForm from './project/ServiceCoordinatorForm';
-// import MinimalMeetupForm from './MinimalMeetupForm.JSX';
-// import MinimalMeetupForm from './MinimalMeetupForm';
-// import MinimalMeetupForm from './MinimalMeetupForm.JSX';
-// import MinimalMeetupForm from './MinimalMeetupForm';
+
+import Login from './project/Login';
+import NotFound from './project/NotFound';
+import PrivateRoute from './Private/PrivateRoute';
+import Register from './project/Register';
+
 
 
 
@@ -47,7 +49,6 @@ function App() {
       {/* <Route path='/' element={ <Registeration/>}/> */}
       <Route path='/service' element={ <ServiceTypeManager/>}/>
       <Route path='/meetup' element={ <MinimalMeetupForm1/>}/>
-      <Route path='/' element={ <VolunteerTableWithModal/>}/>
       <Route path='/Registeration' element={<VolunteerRegistrationForm/>}/>
       <Route path='/manager' element={<ManagerList/>}/>
       <Route path='/post-service' element={<ServiceForm/>}/>
@@ -64,8 +65,10 @@ function App() {
       <Route path='/july/flc/attendece' element={<UserTable/>} />
       <Route path='/volunteerform' element={<VolunteerForm/>}/>
       <Route path='/servicecoordinatorform' element={<ServiceCoordinatorForm/>}/>
-
-
+      <Route path='*' element={<NotFound/>}/>
+      <Route path='/' element={ <PrivateRoute><VolunteerTableWithModal/></PrivateRoute>}/>
+      <Route path='/api/admin/login' element={<Login/>}/>
+      <Route path='/api/admin/register' element={<Register/>}/>
       </Routes>
    
     </ChakraProvider>
