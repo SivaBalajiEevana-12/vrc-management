@@ -32,6 +32,7 @@ import {
   AlertIcon,
   AlertTitle,
 } from '@chakra-ui/react';
+import { DownloadIcon } from '@chakra-ui/icons';
 import axios from 'axios';
 import Layout from '../components/Layout';
 
@@ -47,11 +48,13 @@ const VolunteerTableWithModal = () => {
 
   const [serviceSelection, setServiceSelection] = useState({});
   const [deleting, setDeleting] = useState(false);
+  const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
     fetchVolunteers();
   }, []);
-  //https://vrc-server-110406681774.asia-south1.run.app/volunteerform/api/volunteers
+
+ 
   const fetchVolunteers = async () => {
     try {
       const res = await axios.get('https://vrc-server-110406681774.asia-south1.run.app/volunteerform/api/volunteers');
@@ -63,6 +66,7 @@ const VolunteerTableWithModal = () => {
     }
   };
 
+
   useEffect(() => {
     axios
       .get('https://vrc-server-110406681774.asia-south1.run.app/servicecoordinator')
@@ -72,6 +76,7 @@ const VolunteerTableWithModal = () => {
       .catch((err) => console.error(err));
   }, []);
 
+  // Filter volunteers
   useEffect(() => {
     const filtered = volunteers.filter((v) => {
       const matchesName = v.name.toLowerCase().includes(filters.name.toLowerCase());
@@ -140,7 +145,6 @@ const VolunteerTableWithModal = () => {
     try {
       await axios.delete(
         `https://vrc-server-110406681774.asia-south1.run.app/volunteerform/api/volunteers/${volId}`
-        // `http://localhost:3300/volunteerform/api/volunteers/${volId}`
       );
       toast({
         title: "Deleted",
@@ -150,7 +154,7 @@ const VolunteerTableWithModal = () => {
       });
       setSelectedVolunteer(null);
       onClose();
-      // Refresh volunteers list
+     
       fetchVolunteers();
     } catch (err) {
       toast({
@@ -168,17 +172,53 @@ const VolunteerTableWithModal = () => {
     return found ? found.serviceName : '';
   };
 
+
+  const handleExport = async () => {
+    setExporting(true);
+    try {
+      await axios.post(
+        'https://vrc-server-110406681774.asia-south1.run.app/volunteerform/api/export-volunteers', 
+        { volunteers } 
+      );
+      toast({
+        title: "Exported!",
+        description: "New volunteers exported to Google Sheets.",
+        status: "success",
+        duration: 2500,
+      });
+    } catch (err) {
+      toast({
+        title: "Export failed",
+        description: err.response?.data?.message || "Export error.",
+        status: "error",
+        duration: 3000,
+      });
+    }
+    setExporting(false);
+  };
+
+
   return (
     <Layout>
       <Box p={6} overflowX="auto" >
-        {/* Volunteer count at top */}
-        <Flex align="center" justify="space-between"mt={["40px",null,null,null]} mb={4}>
+       
+        <Flex align="center" justify="space-between" mt={["40px",null,null,null]} mb={4}>
           <Alert status="info" borderRadius="md" maxW="380px">
             <AlertIcon />
             <AlertTitle>
               Total Volunteers Registered: {volunteers.length}
             </AlertTitle>
           </Alert>
+          <Button
+            leftIcon={<DownloadIcon />}
+            colorScheme="blue"
+            isLoading={exporting}
+            onClick={handleExport}
+            borderRadius="full"
+            variant="solid"
+          >
+            Export to Google Sheets
+          </Button>
         </Flex>
 
         <HStack spacing={4} mb={4} flexWrap="wrap">
@@ -217,7 +257,7 @@ const VolunteerTableWithModal = () => {
               <Th color="white">Gender</Th>
               <Th color="white">Age</Th>
               <Th color="white">Service Availability</Th>
-              {/* <Th color="white">Assigned Service</Th> */}
+              
               <Th color="white">Assign</Th>
             </Tr>
           </Thead>
