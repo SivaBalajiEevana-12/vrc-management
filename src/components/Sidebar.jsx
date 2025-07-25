@@ -35,10 +35,10 @@ const SidebarContent = ({ onClose }) => (
       { label: "Volunteer-Manager", path: "/Registeration" },
       { label: "Managers", path: "/manager" },
       { label: "Services", path: "/service-list" },
-      { label: "Attendance", path: "/attendence" },
-      { label: "FLC-Attendance", path: "/fcuser/attendece" },
-      { label: "Bahuda Ratha Yatra-Attendance", path: "/july/user/attendece" },
-      {label:"Flc-2 Attendance",path:"/july/flc/attendece"}
+      // // { label: "Attendance", path: "/attendence" },
+      // { label: "FLC-Attendance", path: "/fcuser/attendece" },
+      // { label: "Bahuda Ratha Yatra-Attendance", path: "/july/user/attendece" },
+      // {label:"Flc-2 Attendance",path:"/july/flc/attendece"}
 
 
      
