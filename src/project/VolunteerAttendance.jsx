@@ -46,7 +46,7 @@ const VolunteerAttendance = () => {
     setVolunteer(null);
     try {
       const res = await fetch(
-        `http://localhost:3300/volunteerform/api/volunteers/${whatsappNumber}`
+        `https://vrc-server-110406681774.asia-south1.run.app/volunteerform/api/volunteers/${whatsappNumber}`
       );
       if (!res.ok) throw new Error("Volunteer not found");
       const data = await res.json();
@@ -62,7 +62,7 @@ const VolunteerAttendance = () => {
     setAttendanceLoading(true);
     setError("");
     try {
-      const res = await fetch("http://localhost:3300/volunteerform/api/attendance", {
+      const res = await fetch("https://vrc-server-110406681774.asia-south1.run.app/volunteerform/api/attendance", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
