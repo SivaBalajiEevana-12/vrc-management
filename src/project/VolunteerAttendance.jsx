@@ -117,7 +117,7 @@ const VolunteerAttendance = () => {
         >
           <HStack justify="center">
             <FaOm size={28} color="#4e148c" />
-            <span>Volunteer Professional ID Card</span>
+            <span>Volunteer Daily Attendance Pass</span>
           </HStack>
         </Text>
         <Text
