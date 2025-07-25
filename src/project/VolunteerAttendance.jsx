@@ -18,10 +18,11 @@ import {
   CardFooter,
   Heading,
   SimpleGrid,
+  Image
 } from "@chakra-ui/react";
 import { CheckCircleIcon } from "@chakra-ui/icons";
 import { FaOm } from "react-icons/fa";
-
+import Icon from "../assets/tilak.png"
 const KRISHNA_QUOTE =
   "“Chant Hare Krishna and be happy.” – Srila Prabhupada";
 
@@ -116,7 +117,8 @@ const VolunteerAttendance = () => {
           lineHeight={{ base: "1.1", md: "1.2" }}
         >
           <HStack justify="center">
-            <FaOm size={28} color="#4e148c" />
+            {/* <FaOm size={28} color="#4e148c" /> */}
+            <Image src={Icon} width={"20px"} />
             <span>Volunteer Daily Attendance Pass</span>
           </HStack>
         </Text>
