@@ -29,49 +29,70 @@ import {
   AlertIcon,
   AlertTitle,
   Select,
-  Checkbox,
   IconButton,
   useBreakpointValue,
 } from '@chakra-ui/react';
-import { HamburgerIcon } from '@chakra-ui/icons';
+import { HamburgerIcon, ChevronLeftIcon, ChevronRightIcon, DownloadIcon } from '@chakra-ui/icons';
 import axios from 'axios';
 import Sidebar from '../components/Sidebar';
 
 const SIDEBAR_WIDTH = 250;
 const SLOT_DATES = ["August 14", "August 15", "August 16", "August 17"];
-
-const getAssignedServiceId = (assignedService) =>
-  assignedService && typeof assignedService === 'object' ? assignedService._id : assignedService || '';
+const PAGE_SIZE = 20;
 
 const VolunteerTable = () => {
   const [volunteers, setVolunteers] = useState([]);
-  const [filteredVolunteers, setFilteredVolunteers] = useState([]);
+  const [totalVolunteers, setTotalVolunteers] = useState(0);
   const [selectedVolunteer, setSelectedVolunteer] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [filters, setFilters] = useState({ name: '', whatsapp: '', slot: SLOT_DATES[0], attendedOnly: false });
+  const [filters, setFilters] = useState({ name: '', whatsapp: '', slot: SLOT_DATES[0] });
   const [serviceCoordinators, setServiceCoordinators] = useState([]);
   const [assigning, setAssigning] = useState({});
   const [serviceSelection, setServiceSelection] = useState({});
   const [deleting, setDeleting] = useState(false);
-  const toast = useToast();
+  const [exporting, setExporting] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
+  const toast = useToast();
   const isMobile = useBreakpointValue({ base: true, md: false });
 
-  useEffect(() => {
-    fetchVolunteers();
-  }, []);
-
-  const fetchVolunteers = async () => {
+  
+  //'https://vrc-server-110406681774.asia-south1.run.app/volunteerform/api/volunteers'
+  const fetchVolunteers = async (page = 1, name = '', whatsapp = '', slot = '') => {
     try {
-      const res = await axios.get('https://vrc-server-110406681774.asia-south1.run.app/volunteerform/api/volunteers');
-      const cleanedData = res.data.filter((v) => v && v.name);
-      setVolunteers(cleanedData);
-      setFilteredVolunteers(cleanedData);
+      const params = {
+        page,
+        pageSize: PAGE_SIZE,
+        ...(name ? { name } : {}),
+        ...(whatsapp ? { whatsapp } : {}),
+        ...(slot ? { slot } : {}),
+      };
+      const res = await axios.get("https://vrc-server-110406681774.asia-south1.run.app/volunteerform/api/volunteers", { params });
+      const list = Array.isArray(res.data.data) ? res.data.data : [];
+      setVolunteers(list);
+      setTotalVolunteers(res.data.totalCount || 0);
     } catch (err) {
       console.error(err);
+      toast({
+        title: "Error",
+        description: "Unable to fetch volunteers.",
+        status: "error",
+        duration: 3000,
+      });
     }
   };
+
+  useEffect(() => {
+    fetchVolunteers(1, filters.name, filters.whatsapp, filters.slot);
+    setCurrentPage(1);
+   
+  }, [filters.name, filters.whatsapp, filters.slot]);
+
+  useEffect(() => {
+    fetchVolunteers(currentPage, filters.name, filters.whatsapp, filters.slot);
+   
+  }, [currentPage]);
 
   useEffect(() => {
     axios
@@ -81,22 +102,6 @@ const VolunteerTable = () => {
       })
       .catch((err) => console.error(err));
   }, []);
-
-  useEffect(() => {
-    const filtered = volunteers.filter((v) => {
-      const matchesName = v.name?.toLowerCase().includes(filters.name.toLowerCase());
-      const matchesWhatsapp = v.whatsappNumber?.includes(filters.whatsapp);
-      const matchesSlot =
-        !filters.slot ||
-        v.serviceAvailability?.some((slot) => slot.date === filters.slot);
-      const matchesAttended =
-        !filters.attendedOnly ||
-        (v.attendance &&
-          v.attendance.some((a) => a.date === filters.slot && a.attended));
-      return matchesName && matchesWhatsapp && matchesSlot && matchesAttended;
-    });
-    setFilteredVolunteers(filtered);
-  }, [filters, volunteers]);
 
   const handleRowClick = (volunteer) => {
     setSelectedVolunteer(volunteer);
@@ -114,20 +119,8 @@ const VolunteerTable = () => {
         `https://vrc-server-110406681774.asia-south1.run.app/volunteerform/api/volunteers/${volId}`,
         { assignedService: value }
       );
-      setVolunteers((prev) =>
-        prev.map((v) =>
-          v._id === volId
-            ? { ...v, assignedService: value }
-            : v
-        )
-      );
-      setFilteredVolunteers((prev) =>
-        prev.map((v) =>
-          v._id === volId
-            ? { ...v, assignedService: value }
-            : v
-        )
-      );
+    
+      fetchVolunteers(currentPage, filters.name, filters.whatsapp, filters.slot);
       toast({
         title: "Success",
         description: "Assigned service coordinator updated.",
@@ -159,7 +152,7 @@ const VolunteerTable = () => {
       });
       setSelectedVolunteer(null);
       onClose();
-      fetchVolunteers();
+      fetchVolunteers(currentPage, filters.name, filters.whatsapp, filters.slot);
     } catch (err) {
       toast({
         title: "Error",
@@ -171,110 +164,173 @@ const VolunteerTable = () => {
     setDeleting(false);
   };
 
+  const handleExportToSheet = async () => {
+    setExporting(true);
+    try {
+     
+      const params = {
+       
+        ...(filters.name ? { name: filters.name } : {}),
+        ...(filters.whatsapp ? { whatsapp: filters.whatsapp } : {}),
+        ...(filters.slot ? { slot: filters.slot } : {}),
+      };
+      const res = await axios.get('https://vrc-server-110406681774.asia-south1.run.app/volunteerform/api/volunteers', { params });
+      const allVolunteers = Array.isArray(res.data.data) ? res.data.data : [];
+      const exportRes = await axios.post(
+        'https://vrc-server-110406681774.asia-south1.run.app/volunteerform/api/export-volunteers',
+        { volunteers: allVolunteers }
+      );
+      toast({
+        title: "Export Successful",
+        description: exportRes.data.message,
+        status: "success",
+        duration: 4000,
+      });
+    } catch (err) {
+      toast({
+        title: "Export Failed",
+        description: err.response?.data?.message || "Failed to export volunteers.",
+        status: "error",
+        duration: 4000,
+      });
+    }
+    setExporting(false);
+  };
+
   const getServiceDropdownValue = (assignedService) => {
     if (!assignedService) return '';
     if (typeof assignedService === 'object') return assignedService._id || '';
     return assignedService;
   };
 
+  const pageCount = Math.ceil(totalVolunteers / PAGE_SIZE);
+
   return (
     <Box minH="100vh" bg="gray.50">
-      
       {isMobile && (
-  <Flex
-    position="fixed"
-    top="0"
-    left="0"
-    right="0"
-    zIndex="1000"
-    bg="gray.800"
-    px={4}
-    py={3}
-    align="center"
-    justify="space-between"
-    boxShadow="md"
-    color={"white"}
-  >
-    <HStack>
-      <IconButton
-        icon={<HamburgerIcon />}
-        variant="ghost"
-        colorScheme="white"
-        onClick={() => setSidebarOpen(true)}
-        aria-label="Open menu"
-        fontSize="2xl"
-      />
-      <Text fontWeight="bold" fontSize="xl">
-        Vcc-Volunteer
-      </Text>
-    </HStack>
-  </Flex>
-)}
-  <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+        <Flex
+          position="fixed"
+          top="0"
+          left="0"
+          right="0"
+          zIndex="1000"
+          bg="gray.800"
+          px={4}
+          py={3}
+          align="center"
+          justify="space-between"
+          boxShadow="md"
+          color={"white"}
+        >
+          <HStack>
+            <IconButton
+              icon={<HamburgerIcon />}
+              variant="ghost"
+              colorScheme="white"
+              onClick={() => setSidebarOpen(true)}
+              aria-label="Open menu"
+              fontSize="2xl"
+            />
+            <Text fontWeight="bold" fontSize="xl">
+              Vcc-Volunteer
+            </Text>
+          </HStack>
+        </Flex>
+      )}
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-     
       <Box
-           as="main"
-           flex="1"
-           p={6}
-           minH="100vh"
-           transition="all 0.2s"
-           ml={{ base: 0, md: `${SIDEBAR_WIDTH}px` }} // 
+        as="main"
+        flex="1"
+        p={6}
+        minH="100vh"
+        transition="all 0.2s"
+        ml={{ base: 0, md: `${SIDEBAR_WIDTH}px` }}
       >
-        
-
-        <Flex align="center" justify="space-between" mt={["60px",null,null,null]} mb={4}>
+        <Flex align="center" justify="space-between" mt={["60px", null, null, null]} mb={4}>
           <Alert status="info" borderRadius="md" maxW="380px">
             <AlertIcon />
             <AlertTitle>
-              Total Volunteers Registered: {volunteers.length}
+              Total Volunteers Registered: {totalVolunteers}
             </AlertTitle>
           </Alert>
+          <Button
+            colorScheme="teal"
+            leftIcon={<DownloadIcon />}
+            onClick={handleExportToSheet}
+            isLoading={exporting}
+            loadingText="Exporting"
+            ml={4}
+          >
+            Export to Google Sheet
+          </Button>
         </Flex>
 
         <HStack spacing={4} mb={4} flexWrap="wrap">
           <Input
             placeholder="Search by name"
             value={filters.name}
-            onChange={(e) => setFilters({ ...filters, name: e.target.value })}
+            onChange={(e) =>
+              setFilters({ ...filters, name: e.target.value })
+            }
             maxW="200px"
           />
           <Input
             placeholder="Search by WhatsApp"
             value={filters.whatsapp}
-            onChange={(e) => setFilters({ ...filters, whatsapp: e.target.value })}
+            onChange={(e) =>
+              setFilters({ ...filters, whatsapp: e.target.value })
+            }
             maxW="200px"
           />
-
-<Box  >
-          <Flex align="center" justify="space-between" flexWrap="wrap">
-           
-            <HStack>
-              <Select
-                maxW="280px"
-                value={filters.slot}
-                onChange={(e) =>
-                  setFilters((prev) => ({
-                    ...prev,
-                    slot: e.target.value,
-                    attendedOnly: false,
-                  }))
-                }
-              >
-                {SLOT_DATES.map((date) => (
-                  <option key={date} value={date}>
-                    {date}
-                  </option>
-                ))}
-              </Select>
-            
-            </HStack>
-          </Flex>
-         
-        </Box>
+          <Box>
+            <Flex align="center" justify="space-between" flexWrap="wrap">
+              <HStack>
+                <Select
+                  maxW="280px"
+                  value={filters.slot}
+                  onChange={(e) =>
+                    setFilters((prev) => ({
+                      ...prev,
+                      slot: e.target.value,
+                    }))
+                  }
+                >
+                  {SLOT_DATES.map((date) => (
+                    <option key={date} value={date}>
+                      {date}
+                    </option>
+                  ))}
+                </Select>
+              </HStack>
+            </Flex>
+          </Box>
         </HStack>
 
-        
+       
+        <Flex align="center" justify="flex-end" mb={2}>
+          <Button
+            size="sm"
+            leftIcon={<ChevronLeftIcon />}
+            onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+            isDisabled={currentPage === 1}
+            mr={2}
+          >
+            Prev
+          </Button>
+          <Text fontSize="md">
+            Page {currentPage} of {pageCount}
+          </Text>
+          <Button
+            size="sm"
+            rightIcon={<ChevronRightIcon />}
+            onClick={() => setCurrentPage((p) => Math.min(p + 1, pageCount))}
+            isDisabled={currentPage >= pageCount}
+            ml={2}
+          >
+            Next
+          </Button>
+        </Flex>
 
         <Table variant="simple" size="md">
           <Thead bg="teal.500">
@@ -290,9 +346,9 @@ const VolunteerTable = () => {
             </Tr>
           </Thead>
           <Tbody>
-            {filteredVolunteers.map((volunteer, idx) => (
+            {volunteers.map((volunteer, idx) => (
               <Tr key={volunteer._id} _hover={{ bg: 'gray.100', cursor: 'pointer' }}>
-                <Td>{idx + 1}</Td>
+                <Td>{(currentPage - 1) * PAGE_SIZE + idx + 1}</Td>
                 <Td>
                   {volunteer.imageUrl ? (
                     <Avatar size="xl" name={volunteer.name} src={volunteer.imageUrl} />
@@ -323,7 +379,7 @@ const VolunteerTable = () => {
                       placeholder="Assign Service"
                       size="sm"
                       maxW="140px"
-                      value={serviceSelection[volunteer._id] || getServiceDropdownValue(volunteer.assignedService) || ''}
+                      value={serviceSelection[volunteer._id] || (volunteer.assignedService?._id || volunteer.assignedService || '')}
                       onChange={(e) =>
                         handleServiceChange(volunteer._id, e.target.value)
                       }
@@ -342,6 +398,31 @@ const VolunteerTable = () => {
             ))}
           </Tbody>
         </Table>
+
+        
+        <Flex align="center" justify="flex-end" my={4}>
+          <Button
+            size="sm"
+            leftIcon={<ChevronLeftIcon />}
+            onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+            isDisabled={currentPage === 1}
+            mr={2}
+          >
+            Prev
+          </Button>
+          <Text fontSize="md">
+            Page {currentPage} of {pageCount}
+          </Text>
+          <Button
+            size="sm"
+            rightIcon={<ChevronRightIcon />}
+            onClick={() => setCurrentPage((p) => Math.min(p + 1, pageCount))}
+            isDisabled={currentPage >= pageCount}
+            ml={2}
+          >
+            Next
+          </Button>
+        </Flex>
 
         {selectedVolunteer && (
           <Modal isOpen={isOpen} onClose={onClose} size="xl" isCentered motionPreset="scale">
