@@ -247,7 +247,7 @@ const VolunteerTable = () => {
         transition="all 0.2s"
         ml={{ base: 0, md: `${SIDEBAR_WIDTH}px` }}
       >
-        <Flex align="center" justify="space-between" mt={["60px", null, null, null]} mb={4}>
+        <Flex flexDirection={{ base: "column", md: "row" }} align={{ base: "left", md: "center" }} justify="space-between" mt={["60px", null, null, null]}  mb={4}>
           <Alert status="info" borderRadius="md" maxW="380px">
             <AlertIcon />
             <AlertTitle>
@@ -260,7 +260,8 @@ const VolunteerTable = () => {
             onClick={handleExportToSheet}
             isLoading={exporting}
             loadingText="Exporting"
-            ml={4}
+            ml={["0px", 4, 4, 4]}
+            mt={["10px", null, null, null]}
           >
             Export to Google Sheet
           </Button>
