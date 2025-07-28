@@ -46,7 +46,7 @@ const VolunteerTable = () => {
   const [selectedVolunteer, setSelectedVolunteer] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [filters, setFilters] = useState({ name: '', whatsapp: '', slot: SLOT_DATES[0] });
+  const [filters, setFilters] = useState({ name: '', whatsapp: '' });
   const [serviceCoordinators, setServiceCoordinators] = useState([]);
   const [assigning, setAssigning] = useState({});
   const [serviceSelection, setServiceSelection] = useState({});
@@ -58,14 +58,13 @@ const VolunteerTable = () => {
   const isMobile = useBreakpointValue({ base: true, md: false });
 
 
-  const fetchVolunteers = async (page = 1, name = '', whatsapp = '', slot = '') => {
+  const fetchVolunteers = async (page = 1, name = '', whatsapp = '') => {
     try {
       const params = {
         page,
         pageSize: PAGE_SIZE,
         ...(name ? { name } : {}),
         ...(whatsapp ? { whatsapp } : {}),
-        ...(slot ? { slot } : {}),
       };
       const res = await axios.get("https://vrc-server-110406681774.asia-south1.run.app/volunteerform/api/volunteers", { params });
       const list = Array.isArray(res.data.data) ? res.data.data : [];
@@ -83,12 +82,12 @@ const VolunteerTable = () => {
   };
 
   useEffect(() => {
-    fetchVolunteers(1, filters.name, filters.whatsapp, filters.slot);
+    fetchVolunteers(1, filters.name, filters.whatsapp);
     setCurrentPage(1);
-  }, [filters.name, filters.whatsapp, filters.slot]);
+  }, [filters.name, filters.whatsapp]);
 
   useEffect(() => {
-    fetchVolunteers(currentPage, filters.name, filters.whatsapp, filters.slot);
+    fetchVolunteers(currentPage, filters.name, filters.whatsapp);
   }, [currentPage]);
 
   useEffect(() => {
@@ -116,7 +115,7 @@ const VolunteerTable = () => {
         `https://vrc-server-110406681774.asia-south1.run.app/volunteerform/api/volunteers/${volId}`,
         { assignedService: value }
       );
-      fetchVolunteers(currentPage, filters.name, filters.whatsapp, filters.slot);
+      fetchVolunteers(currentPage, filters.name, filters.whatsapp);
       toast({
         title: "Success",
         description: "Assigned service coordinator updated.",
@@ -148,7 +147,7 @@ const VolunteerTable = () => {
       });
       setSelectedVolunteer(null);
       onClose();
-      fetchVolunteers(currentPage, filters.name, filters.whatsapp, filters.slot);
+      fetchVolunteers(currentPage, filters.name, filters.whatsapp);
     } catch (err) {
       toast({
         title: "Error",
@@ -168,7 +167,7 @@ const VolunteerTable = () => {
         all: "true", 
         ...(filters.name ? { name: filters.name } : {}),
         ...(filters.whatsapp ? { whatsapp: filters.whatsapp } : {}),
-        ...(filters.slot ? { slot: filters.slot } : {}),
+       
       };
       const res = await axios.get('https://vrc-server-110406681774.asia-south1.run.app/volunteerform/api/volunteers', { params });
       const allVolunteers = Array.isArray(res.data.data) ? res.data.data : [];
@@ -280,28 +279,7 @@ const VolunteerTable = () => {
             }
             maxW="200px"
           />
-          {/* <Box>
-            <Flex align="center" justify="space-between" flexWrap="wrap">
-              <HStack>
-                <Select
-                  maxW="280px"
-                  value={filters.slot}
-                  onChange={(e) =>
-                    setFilters((prev) => ({
-                      ...prev,
-                      slot: e.target.value,
-                    }))
-                  }
-                >
-                  {SLOT_DATES.map((date) => (
-                    <option key={date} value={date}>
-                      {date}
-                    </option>
-                  ))}
-                </Select>
-              </HStack>
-            </Flex>
-          </Box> */}
+     
         </HStack>
 
         <Flex align="center" justify="flex-end" mb={2}>
