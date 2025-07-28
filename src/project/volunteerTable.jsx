@@ -280,7 +280,7 @@ const VolunteerTable = () => {
             }
             maxW="200px"
           />
-          <Box>
+          {/* <Box>
             <Flex align="center" justify="space-between" flexWrap="wrap">
               <HStack>
                 <Select
@@ -301,7 +301,7 @@ const VolunteerTable = () => {
                 </Select>
               </HStack>
             </Flex>
-          </Box>
+          </Box> */}
         </HStack>
 
         <Flex align="center" justify="flex-end" mb={2}>
