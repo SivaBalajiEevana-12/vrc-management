@@ -57,8 +57,7 @@ const VolunteerTable = () => {
   const toast = useToast();
   const isMobile = useBreakpointValue({ base: true, md: false });
 
-  
-  //'https://vrc-server-110406681774.asia-south1.run.app/volunteerform/api/volunteers'
+
   const fetchVolunteers = async (page = 1, name = '', whatsapp = '', slot = '') => {
     try {
       const params = {
@@ -86,12 +85,10 @@ const VolunteerTable = () => {
   useEffect(() => {
     fetchVolunteers(1, filters.name, filters.whatsapp, filters.slot);
     setCurrentPage(1);
-   
   }, [filters.name, filters.whatsapp, filters.slot]);
 
   useEffect(() => {
     fetchVolunteers(currentPage, filters.name, filters.whatsapp, filters.slot);
-   
   }, [currentPage]);
 
   useEffect(() => {
@@ -119,7 +116,6 @@ const VolunteerTable = () => {
         `https://vrc-server-110406681774.asia-south1.run.app/volunteerform/api/volunteers/${volId}`,
         { assignedService: value }
       );
-    
       fetchVolunteers(currentPage, filters.name, filters.whatsapp, filters.slot);
       toast({
         title: "Success",
@@ -164,12 +160,12 @@ const VolunteerTable = () => {
     setDeleting(false);
   };
 
+
   const handleExportToSheet = async () => {
     setExporting(true);
     try {
-     
       const params = {
-       
+        all: "true", 
         ...(filters.name ? { name: filters.name } : {}),
         ...(filters.whatsapp ? { whatsapp: filters.whatsapp } : {}),
         ...(filters.slot ? { slot: filters.slot } : {}),
@@ -308,7 +304,6 @@ const VolunteerTable = () => {
           </Box>
         </HStack>
 
-       
         <Flex align="center" justify="flex-end" mb={2}>
           <Button
             size="sm"
@@ -400,7 +395,6 @@ const VolunteerTable = () => {
           </Tbody>
         </Table>
 
-        
         <Flex align="center" justify="flex-end" my={4}>
           <Button
             size="sm"
