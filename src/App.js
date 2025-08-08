@@ -39,6 +39,7 @@ import NotFound from './project/NotFound';
 import PrivateRoute from './Private/PrivateRoute';
 import Register from './project/Register';
 import VolunteerAttendance from './project/VolunteerAttendance';
+import CheckServiceAssignment from './project/CheckServiceAssignment';
 
 
 
@@ -71,6 +72,7 @@ function App() {
       <Route path='/api/admin/login' element={<Login/>}/>
       <Route path='/api/admin/register' element={<Register/>}/>
       <Route path='/api/attendance' element={<VolunteerAttendance/>} />
+      <Route path='/checkserviceassignment' element={<CheckServiceAssignment/>}/>
       </Routes>
    
     </ChakraProvider>
