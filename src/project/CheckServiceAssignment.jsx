@@ -59,7 +59,6 @@ function CheckServiceAssignment() {
         return;
       }
 
-      // Check if volunteer has an assigned service
       if (!volunteerData.assignedService || !volunteerData.assignedService._id) {
         setService(null);
         toast({
@@ -73,7 +72,7 @@ function CheckServiceAssignment() {
         return;
       }
 
-      // Check if the service details are properly assigned (not "nan")
+
       const assignedService = volunteerData.assignedService;
       
       if (assignedService.serviceName === "nan" || 
@@ -95,7 +94,7 @@ function CheckServiceAssignment() {
         return;
       }
 
-      // Service is properly assigned, show the details
+ 
       setService({
         serviceName: assignedService.serviceName,
         coordinatorName: assignedService.coordinatorName,
