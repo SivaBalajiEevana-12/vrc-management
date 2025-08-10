@@ -36,6 +36,8 @@ function CheckServiceAssignment() {
         }
         throw new Error('Failed to fetch volunteer data');
       }
+
+      // added backend route 
       return await response.json();
     } catch (error) {
       console.error('Error fetching volunteer data:', error);
