@@ -25,21 +25,6 @@ function CheckServiceAssignment() {
 
   const normalizeWhatsapp = (num) => num.replace(/\D/g, "");
 
-  const fetchServiceCoordinators = async () => {
-    try {
-      const response = await fetch(
-        'https://vrc-server-110406681774.asia-south1.run.app/servicecoordinator'
-      );
-      if (!response.ok) {
-        throw new Error('Failed to fetch service coordinators');
-      }
-      return await response.json();
-    } catch (error) {
-      console.error('Error fetching service coordinators:', error);
-      return [];
-    }
-  };
-
   const fetchVolunteerData = async (whatsappNumber) => {
     try {
       const response = await fetch(
@@ -65,22 +50,17 @@ function CheckServiceAssignment() {
     const normalized = normalizeWhatsapp(whatsapp);
 
     try {
-
-      const [volunteerData, serviceCoordinators] = await Promise.all([
-        fetchVolunteerData(normalized),
-        fetchServiceCoordinators()
-      ]);
+      const volunteerData = await fetchVolunteerData(normalized);
 
       console.log('Volunteer Data:', volunteerData);
-      console.log('Service Coordinators:', serviceCoordinators);
 
       if (!volunteerData) {
         setNotFound(true);
         return;
       }
 
-      
-      if (!volunteerData.assignedService || !volunteerData.assignedService.coordinatorNumber) {
+      // Check if volunteer has an assigned service
+      if (!volunteerData.assignedService || !volunteerData.assignedService._id) {
         setService(null);
         toast({
           title: "No Service Assigned.",
@@ -93,43 +73,42 @@ function CheckServiceAssignment() {
         return;
       }
 
-
-      const assignedCoordinatorNumber = volunteerData.assignedService.coordinatorNumber;
-      console.log('Looking for coordinator phone number:', assignedCoordinatorNumber);
-
-     
-      const matchingCoordinator = serviceCoordinators.find(
-        coordinator => coordinator.coordinatorNumber === assignedCoordinatorNumber
-      );
-
-      console.log('Matching Coordinator:', matchingCoordinator);
-
-      if (matchingCoordinator) {
-       
-        setService({
-          serviceName: matchingCoordinator.serviceName,
-          coordinatorName: matchingCoordinator.coordinatorName,
-          coordinatorNumber: matchingCoordinator.coordinatorNumber,
-        });
+      // Check if the service details are properly assigned (not "nan")
+      const assignedService = volunteerData.assignedService;
+      
+      if (assignedService.serviceName === "nan" || 
+          assignedService.coordinatorName === "nan" || 
+          assignedService.coordinatorNumber === "nan" ||
+          !assignedService.serviceName ||
+          !assignedService.coordinatorName ||
+          !assignedService.coordinatorNumber) {
         
+        setService(null);
         toast({
-          title: "Service Found!",
-          description: `You are assigned to ${matchingCoordinator.serviceName}`,
-          status: "success",
-          duration: 3000,
-          isClosable: true,
-        });
-      } else {
-       
-        console.log('No matching coordinator found for phone number:', assignedCoordinatorNumber);
-        toast({
-          title: "Service Data Not Found",
-          description: "Service assigned but coordinator details not found. Please contact admin.",
-          status: "warning",
+          title: "Service Not Assigned Yet.",
+          description:
+            "Your seva (service) will be assigned soon. Please contact your coordinator if you have questions.",
+          status: "info",
           duration: 5000,
           isClosable: true,
         });
+        return;
       }
+
+      // Service is properly assigned, show the details
+      setService({
+        serviceName: assignedService.serviceName,
+        coordinatorName: assignedService.coordinatorName,
+        coordinatorNumber: assignedService.coordinatorNumber,
+      });
+      
+      toast({
+        title: "Service Found!",
+        description: `You are assigned to ${assignedService.serviceName}`,
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
 
     } catch (error) {
       console.error('Error during service check:', error);
