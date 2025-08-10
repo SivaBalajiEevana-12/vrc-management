@@ -9,6 +9,7 @@ import {
   useToast,
   HStack,
   Icon,
+  Spinner,
 } from "@chakra-ui/react";
 import { FaPrayingHands } from "react-icons/fa";
 
@@ -22,8 +23,40 @@ function CheckServiceAssignment() {
   const [notFound, setNotFound] = useState(false);
   const toast = useToast();
 
-
   const normalizeWhatsapp = (num) => num.replace(/\D/g, "");
+
+  const fetchServiceCoordinators = async () => {
+    try {
+      const response = await fetch(
+        'https://vrc-server-110406681774.asia-south1.run.app/servicecoordinator'
+      );
+      if (!response.ok) {
+        throw new Error('Failed to fetch service coordinators');
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching service coordinators:', error);
+      return [];
+    }
+  };
+
+  const fetchVolunteerData = async (whatsappNumber) => {
+    try {
+      const response = await fetch(
+        `https://vrc-server-110406681774.asia-south1.run.app/volunteerform/api/volunteers/${whatsappNumber}`
+      );
+      if (!response.ok) {
+        if (response.status === 404) {
+          return null;
+        }
+        throw new Error('Failed to fetch volunteer data');
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching volunteer data:', error);
+      return null;
+    }
+  };
 
   const handleCheck = async () => {
     setChecking(true);
@@ -32,13 +65,22 @@ function CheckServiceAssignment() {
     const normalized = normalizeWhatsapp(whatsapp);
 
     try {
-      const res = await fetch(
-        `https://vrc-server-110406681774.asia-south1.run.app/volunteerform/api/${normalized}/assigned-services`
-      );
-      const data = await res.json();
-      if (res.ok && data.assignedService) {
-        setService(data.assignedService);
-      } else if (data.message === "No service assigned yet.") {
+
+      const [volunteerData, serviceCoordinators] = await Promise.all([
+        fetchVolunteerData(normalized),
+        fetchServiceCoordinators()
+      ]);
+
+      console.log('Volunteer Data:', volunteerData);
+      console.log('Service Coordinators:', serviceCoordinators);
+
+      if (!volunteerData) {
+        setNotFound(true);
+        return;
+      }
+
+      
+      if (!volunteerData.assignedService || !volunteerData.assignedService.coordinatorNumber) {
         setService(null);
         toast({
           title: "No Service Assigned.",
@@ -48,11 +90,57 @@ function CheckServiceAssignment() {
           duration: 5000,
           isClosable: true,
         });
-      } else {
-        setNotFound(true);
+        return;
       }
-    } catch {
+
+
+      const assignedCoordinatorNumber = volunteerData.assignedService.coordinatorNumber;
+      console.log('Looking for coordinator phone number:', assignedCoordinatorNumber);
+
+     
+      const matchingCoordinator = serviceCoordinators.find(
+        coordinator => coordinator.coordinatorNumber === assignedCoordinatorNumber
+      );
+
+      console.log('Matching Coordinator:', matchingCoordinator);
+
+      if (matchingCoordinator) {
+       
+        setService({
+          serviceName: matchingCoordinator.serviceName,
+          coordinatorName: matchingCoordinator.coordinatorName,
+          coordinatorNumber: matchingCoordinator.coordinatorNumber,
+        });
+        
+        toast({
+          title: "Service Found!",
+          description: `You are assigned to ${matchingCoordinator.serviceName}`,
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+      } else {
+       
+        console.log('No matching coordinator found for phone number:', assignedCoordinatorNumber);
+        toast({
+          title: "Service Data Not Found",
+          description: "Service assigned but coordinator details not found. Please contact admin.",
+          status: "warning",
+          duration: 5000,
+          isClosable: true,
+        });
+      }
+
+    } catch (error) {
+      console.error('Error during service check:', error);
       setNotFound(true);
+      toast({
+        title: "Error",
+        description: "Something went wrong while checking your service assignment.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
     } finally {
       setChecking(false);
     }
@@ -120,7 +208,7 @@ function CheckServiceAssignment() {
               px={8}
               isLoading={checking}
               onClick={handleCheck}
-              leftIcon={<FaPrayingHands />}
+              leftIcon={checking ? <Spinner size="sm" /> : <FaPrayingHands />}
               disabled={!normalizeWhatsapp(whatsapp) || checking}
             >
               Check
@@ -159,7 +247,7 @@ function CheckServiceAssignment() {
 
           {notFound && (
             <Text color="red.500" fontWeight="bold" mt={2}>
-              Volunteer not found. Please check your WhatsApp number.
+              Volunteer not found. Please check your WhatsApp number or contact admin.
             </Text>
           )}
         </VStack>
@@ -177,4 +265,5 @@ function CheckServiceAssignment() {
     </Box>
   );
 }
+
 export default CheckServiceAssignment;
