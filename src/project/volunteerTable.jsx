@@ -61,7 +61,7 @@ const VolunteerTable = () => {
   const toast = useToast();
   const isMobile = useBreakpointValue({ base: true, md: false });
 
-  // Helper: get assigned service id robustly and ensure it matches coordinator list
+
   const getDropdownValue = (vol) => {
     if (serviceSelection[vol._id] !== undefined) return serviceSelection[vol._id];
     const assignedId =
@@ -129,13 +129,14 @@ const VolunteerTable = () => {
     onOpen();
   };
 
-  // *** FIXED: send full object, not just ID ***
+  // *** UPDATED: send complete object with all required fields ***
   const handleServiceChange = async (volId, selectedCoordinatorId) => {
     setServiceSelection(prev => ({
       ...prev,
       [volId]: selectedCoordinatorId,
     }));
     setAssigning(prev => ({ ...prev, [volId]: true }));
+    
     try {
       // Find full coordinator object for the selected id
       const coordinator = serviceCoordinators.find(
@@ -143,22 +144,25 @@ const VolunteerTable = () => {
       );
       if (!coordinator) throw new Error("Coordinator not found");
 
-      // Only send the required fields
+      // Create complete assigned service object with current timestamp
       const assignedServiceObj = {
         _id: coordinator._id,
         serviceName: coordinator.serviceName,
         coordinatorName: coordinator.coordinatorName,
         coordinatorNumber: coordinator.coordinatorNumber,
+        addedAt: new Date().toISOString(), 
+        __v: 0
       };
 
       await axios.patch(
         `https://vrc-server-110406681774.asia-south1.run.app/volunteerform/api/volunteers/${volId}`,
         { assignedService: assignedServiceObj }
       );
+      
       fetchVolunteers(currentPage, filters.name, filters.whatsapp);
       toast({
         title: 'Success',
-        description: 'Assigned service coordinator updated.',
+        description: `Assigned service coordinator updated to ${coordinator.serviceName}.`,
         status: 'success',
         duration: 2000,
       });
