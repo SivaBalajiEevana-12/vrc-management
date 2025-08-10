@@ -74,7 +74,8 @@ function CheckServiceAssignment() {
       }
 
       const assignedService = volunteerData.assignedService;
-   
+      
+      // Check for invalid/placeholder values
       if (assignedService.serviceName === "nan" || 
           assignedService.coordinatorName === "nan" || 
           assignedService.coordinatorNumber === "nan" ||
@@ -94,7 +95,7 @@ function CheckServiceAssignment() {
         return;
       }
 
-
+      // If we reach here, show the service details
       setService({
         serviceName: assignedService.serviceName,
         coordinatorName: assignedService.coordinatorName,
